@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocha Game Logic Tests</title>
+    <link rel="stylesheet" href="style.css"> <!-- Optional: for consistent styling of results -->
+    <style>
+        body { padding: 20px; font-family: sans-serif; }
+        #test-results { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+        .test-pass { color: green; }
+        .test-fail { color: red; font-weight: bold; }
+        .test-summary { margin-top: 10px; font-weight: bold; }
+        h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;}
+    </style>
+</head>
+<body>
+    <h1>Pocha Game Logic Tests</h1>
+
+    <!-- Mock DOM elements required by script.js. Add more as needed. -->
+    <input type="text" id="player1-name" value="P1">
+    <input type="text" id="player2-name" value="P2">
+    <input type="text" id="player3-name" value="P3">
+    <input type="text" id="player4-name" value="P4">
+
+    <div id="round-info"></div>
+
+    <input type="number" id="player1-bid">
+    <input type="number" id="player2-bid">
+    <input type="number" id="player3-bid">
+    <input type="number" id="player4-bid">
+
+    <input type="number" id="player1-tricks">
+    <input type="number" id="player2-tricks">
+    <input type="number" id="player3-tricks">
+    <input type="number" id="player4-tricks">
+
+    <button id="submit-round-button">Submit</button>
+    <button id="reset-game-button">Reset</button>
+
+    <table id="summary-table">
+        <thead>
+            <tr>
+                <th>Round</th>
+                <th>Cards</th>
+                <th>Player 1 (Bid/Won/Total)</th>
+                <th>Player 2 (Bid/Won/Total)</th>
+                <th>Player 3 (Bid/Won/Total)</th>
+                <th>Player 4 (Bid/Won/Total)</th>
+            </tr>
+        </thead>
+        <tbody id="summary-table-body"></tbody>
+    </table>
+    <!-- End of Mock DOM -->
+
+    <div id="test-results">
+        <h2>Test Results:</h2>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="tests.js"></script>
+</body>
+</html>
