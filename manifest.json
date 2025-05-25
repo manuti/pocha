@@ -1,8 +1,21 @@
 {
   "name": "PochaCounter",
-  "theme_color": "#000000",
+  "short_name": "Pocha",
+  "start_url": ".",
+  "display": "standalone",
   "background_color": "#000000",
-  "short_name": "PochaCounter",
-  "id": "pocha-1.0",
-  "description": "Contador de puntos del juego de la pocha."
+  "theme_color": "#000000",
+  "description": "Contador de puntos del juego de la pocha.",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
