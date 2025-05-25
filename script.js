@@ -7,7 +7,7 @@ let players = [
 ];
 let currentRound = 0;
 let gameActive = true;
-const roundCardsSequence = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+const roundCardsSequence = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 const maxRounds = roundCardsSequence.length;
 
 // 2. DOM Element References
