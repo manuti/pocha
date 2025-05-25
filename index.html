@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocha Points Counter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pocha Points Counter</h1>
+
+    <section id="player-setup">
+        <h2>Players</h2>
+        <input type="text" id="player1-name" placeholder="Player 1 Name">
+        <input type="text" id="player2-name" placeholder="Player 2 Name">
+        <input type="text" id="player3-name" placeholder="Player 3 Name">
+        <input type="text" id="player4-name" placeholder="Player 4 Name">
+    </section>
+
+    <section id="game-area">
+        <h2 id="round-info">Round 1 - 1 Card</h2>
+
+        <div id="player-round-inputs">
+            <!-- Player 1 Input Group -->
+            <div class="player-input-group">
+                <h4 class="player-name-header" id="p1-input-header">Player 1</h4>
+                <div class="input-row">
+                    <div class="input-control-group">
+                        <label for="player1-bid">Bid:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player1-bid" aria-label="Decrease Player 1 Bid">-</button>
+                            <span class="value-display" id="player1-bid-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player1-bid" aria-label="Increase Player 1 Bid">+</button>
+                            <input type="number" class="hidden-original-input" name="player1-bid" id="player1-bid" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="input-control-group">
+                        <label for="player1-tricks">Tricks Won:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player1-tricks" aria-label="Decrease Player 1 Tricks">-</button>
+                            <span class="value-display" id="player1-tricks-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player1-tricks" aria-label="Increase Player 1 Tricks">+</button>
+                            <input type="number" class="hidden-original-input" name="player1-tricks" id="player1-tricks" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 2 Input Group -->
+            <div class="player-input-group">
+                <h4 class="player-name-header" id="p2-input-header">Player 2</h4>
+                <div class="input-row">
+                    <div class="input-control-group">
+                        <label for="player2-bid">Bid:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player2-bid" aria-label="Decrease Player 2 Bid">-</button>
+                            <span class="value-display" id="player2-bid-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player2-bid" aria-label="Increase Player 2 Bid">+</button>
+                            <input type="number" class="hidden-original-input" name="player2-bid" id="player2-bid" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="input-control-group">
+                        <label for="player2-tricks">Tricks Won:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player2-tricks" aria-label="Decrease Player 2 Tricks">-</button>
+                            <span class="value-display" id="player2-tricks-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player2-tricks" aria-label="Increase Player 2 Tricks">+</button>
+                            <input type="number" class="hidden-original-input" name="player2-tricks" id="player2-tricks" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 3 Input Group -->
+            <div class="player-input-group">
+                <h4 class="player-name-header" id="p3-input-header">Player 3</h4>
+                <div class="input-row">
+                    <div class="input-control-group">
+                        <label for="player3-bid">Bid:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player3-bid" aria-label="Decrease Player 3 Bid">-</button>
+                            <span class="value-display" id="player3-bid-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player3-bid" aria-label="Increase Player 3 Bid">+</button>
+                            <input type="number" class="hidden-original-input" name="player3-bid" id="player3-bid" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="input-control-group">
+                        <label for="player3-tricks">Tricks Won:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player3-tricks" aria-label="Decrease Player 3 Tricks">-</button>
+                            <span class="value-display" id="player3-tricks-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player3-tricks" aria-label="Increase Player 3 Tricks">+</button>
+                            <input type="number" class="hidden-original-input" name="player3-tricks" id="player3-tricks" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 4 Input Group -->
+            <div class="player-input-group">
+                <h4 class="player-name-header" id="p4-input-header">Player 4</h4>
+                <div class="input-row">
+                    <div class="input-control-group">
+                        <label for="player4-bid">Bid:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player4-bid" aria-label="Decrease Player 4 Bid">-</button>
+                            <span class="value-display" id="player4-bid-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player4-bid" aria-label="Increase Player 4 Bid">+</button>
+                            <input type="number" class="hidden-original-input" name="player4-bid" id="player4-bid" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="input-control-group">
+                        <label for="player4-tricks">Tricks Won:</label>
+                        <div class="custom-number-input">
+                            <button type="button" class="decrement-btn" data-target-input="player4-tricks" aria-label="Decrease Player 4 Tricks">-</button>
+                            <span class="value-display" id="player4-tricks-display">0</span>
+                            <button type="button" class="increment-btn" data-target-input="player4-tricks" aria-label="Increase Player 4 Tricks">+</button>
+                            <input type="number" class="hidden-original-input" name="player4-tricks" id="player4-tricks" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End of #player-round-inputs -->
+
+        <button id="submit-round-button">Submit Round</button>
+    </section>
+
+    <section id="game-summary">
+        <h2>Game Summary</h2>
+        <table id="summary-table">
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Cards</th>
+                    <th>Player 1 (Bid/Won/Points/Total)</th>
+                    <th>Player 2 (Bid/Won/Points/Total)</th>
+                    <th>Player 3 (Bid/Won/Points/Total)</th>
+                    <th>Player 4 (Bid/Won/Points/Total)</th>
+                </tr>
+            </thead>
+            <tbody id="summary-table-body">
+                <!-- Round data will be added here by script.js -->
+            </tbody>
+        </table>
+    </section>
+
+    <button id="reset-game-button">Reset Game</button>
+
+    <script src="script.js"></script>
+    </div>
+</body>
+</html>
