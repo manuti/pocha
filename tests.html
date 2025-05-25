@@ -25,18 +25,39 @@
 
     <div id="round-info"></div>
 
-    <input type="number" id="player1-bid">
-    <input type="number" id="player2-bid">
-    <input type="number" id="player3-bid">
-    <input type="number" id="player4-bid">
+    <!-- Minimal Mock for Game Area Inputs to support script.js initialization -->
+    <div id="game-area"> <!-- Added to match script.js query for #game-area .decrement-btn etc. -->
+        <h4 id="p1-input-header">Player 1</h4> <!-- For updatePlayerInputGroupHeaders -->
+        <div class="custom-number-input">
+            <button class="decrement-btn" data-target-input="player1-bid">-</button>
+            <span id="player1-bid-display">0</span>
+            <button class="increment-btn" data-target-input="player1-bid">+</button>
+            <input type="number" class="hidden-original-input" id="player1-bid" value="0">
+        </div>
+        <div class="custom-number-input">
+            <button class="decrement-btn" data-target-input="player1-tricks">-</button>
+            <span id="player1-tricks-display">0</span>
+            <button class="increment-btn" data-target-input="player1-tricks">+</button>
+            <input type="number" class="hidden-original-input" id="player1-tricks" value="0">
+        </div>
 
-    <input type="number" id="player1-tricks">
-    <input type="number" id="player2-tricks">
-    <input type="number" id="player3-tricks">
-    <input type="number" id="player4-tricks">
+        <!-- Existing hidden inputs for other players (script.js still references them directly for value collection) -->
+        <!-- These don't need the full custom number input mock for basic script.js init, -->
+        <!-- as long as setupCustomNumberInputs handles missing elements gracefully or only runs on found ones. -->
+        <!-- However, for tests involving direct interaction with these players' custom inputs, -->
+        <!-- their mock structures would need to be complete. -->
+        <input type="number" class="hidden-original-input" id="player2-bid" value="0">
+        <input type="number" class="hidden-original-input" id="player3-bid" value="0">
+        <input type="number" class="hidden-original-input" id="player4-bid" value="0">
+        <input type="number" class="hidden-original-input" id="player2-tricks" value="0">
+        <input type="number" class="hidden-original-input" id="player3-tricks" value="0">
+        <input type="number" class="hidden-original-input" id="player4-tricks" value="0">
 
-    <button id="submit-round-button">Submit</button>
+        <button id="submit-round-button">Submit</button> <!-- Already present, moved inside #game-area for consistency -->
+    </div>
+    <!-- resetGameButton is outside game-area, which is fine -->
     <button id="reset-game-button">Reset</button>
+
 
     <table id="summary-table">
         <thead>

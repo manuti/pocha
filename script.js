@@ -76,13 +76,97 @@ function updateSummaryTableHeadersFromState() {
 }
 
 function updateControlsBasedOnGameState() {
-    const allGameAreaInputs = document.querySelectorAll('#game-area input');
+    const allGameAreaInputs = document.querySelectorAll('#game-area input.hidden-original-input'); // Target only hidden inputs
+    const allCustomButtons = document.querySelectorAll('#game-area .decrement-btn, #game-area .increment-btn');
+
     if (gameActive) {
-        allGameAreaInputs.forEach(input => input.disabled = false);
+        allGameAreaInputs.forEach(input => input.disabled = false); // Not strictly necessary as they are hidden
+        allCustomButtons.forEach(button => button.disabled = false);
         submitRoundButton.disabled = false;
     } else {
         allGameAreaInputs.forEach(input => input.disabled = true);
+        allCustomButtons.forEach(button => button.disabled = true);
         submitRoundButton.disabled = true;
+    }
+}
+
+// --- Custom Number Input Setup ---
+function setupCustomNumberInputs() {
+    const customInputs = document.querySelectorAll('.custom-number-input');
+    customInputs.forEach(inputWrapper => {
+        const decrementBtn = inputWrapper.querySelector('.decrement-btn');
+        const incrementBtn = inputWrapper.querySelector('.increment-btn');
+        // Both buttons should have the same data-target-input
+        const targetInputId = decrementBtn ? decrementBtn.dataset.targetInput : (incrementBtn ? incrementBtn.dataset.targetInput : null);
+
+        if (!targetInputId) {
+            console.error("Missing data-target-input on custom number input buttons.", inputWrapper);
+            return;
+        }
+
+        const hiddenInput = document.getElementById(targetInputId);
+        const displaySpan = document.getElementById(targetInputId + '-display');
+
+        if (!hiddenInput || !displaySpan) {
+            console.error("Missing hidden input or display span for target:", targetInputId);
+            return;
+        }
+
+        // Set initial display from hidden input's value (e.g., after load or reset)
+        displaySpan.textContent = hiddenInput.value;
+
+        if (decrementBtn) {
+            decrementBtn.addEventListener('click', () => {
+                let value = parseInt(hiddenInput.value);
+                value = Math.max(0, value - 1); // Ensure not less than 0
+                hiddenInput.value = value;
+                displaySpan.textContent = value;
+            });
+        }
+
+        if (incrementBtn) {
+            incrementBtn.addEventListener('click', () => {
+                let value = parseInt(hiddenInput.value);
+                let maxValue = Infinity;
+
+                if (targetInputId.includes('tricks')) {
+                    // currentRound is 0-indexed, which is correct for roundCardsSequence
+                    if (currentRound >= 0 && currentRound < roundCardsSequence.length) {
+                        maxValue = roundCardsSequence[currentRound];
+                    } else {
+                        maxValue = 0; // Should not happen in normal flow, but safe default
+                        console.warn("currentRound is out of bounds for trick validation:", currentRound);
+                    }
+                }
+                // For bids, there's no specific max other than what fits in cards (e.g. 10 for 10 cards)
+                // but the problem usually is overbidding total, not individual bids.
+                // We can add a general cap if needed, e.g., based on max cards in any round (10).
+                else if (targetInputId.includes('bid')) {
+                     if (currentRound >= 0 && currentRound < roundCardsSequence.length) {
+                        maxValue = roundCardsSequence[currentRound];
+                    } else {
+                        maxValue = 0; 
+                        console.warn("currentRound is out of bounds for bid validation:", currentRound);
+                    }
+                }
+
+
+                value = Math.min(maxValue, value + 1);
+                hiddenInput.value = value;
+                displaySpan.textContent = value;
+            });
+        }
+    });
+}
+
+// --- Update Player Name Headers in Input Groups ---
+function updatePlayerInputGroupHeaders() {
+    for (let i = 0; i < 4; i++) {
+        const headerId = `p${i + 1}-input-header`;
+        const headerElement = document.getElementById(headerId);
+        if (headerElement) {
+            headerElement.textContent = players[i].name || `Player ${i + 1}`;
+        }
     }
 }
 
@@ -94,39 +178,50 @@ function initGame(isReset = false) {
     }
 
     if (!isReset && loadGame()) {
-        updatePlayerNameInputsFromState();
-        updateSummaryTableHeadersFromState(); // Essential for loaded names
-        updateControlsBasedOnGameState();
+        updatePlayerNameInputsFromState(); // For player setup section
+        updateSummaryTableHeadersFromState();
+        updatePlayerInputGroupHeaders(); // For game area headers
+        updateControlsBasedOnGameState(); // Disables/enables buttons based on gameActive
+
+        // Ensure custom input displays match loaded hidden input values
+        // setupCustomNumberInputs() will read from hidden inputs, so it needs to be called AFTER loadGame
+        setupCustomNumberInputs();
+
 
         if (!gameActive) {
-            // If game was over, ensure roundInfoDisplay reflects it correctly
-             roundInfoDisplay.textContent = "Game Over! Final Scores:";
+            roundInfoDisplay.textContent = "Game Over! Final Scores:";
+            // Controls are already disabled by updateControlsBasedOnGameState
         } else {
-            displayNextRoundInfo(); // Sets round info and clears bid/trick inputs
+            displayNextRoundInfo(); // Sets round info and clears/resets custom input displays
         }
-        return; // Loaded state, skip default initialization
+        return; 
     }
 
     // Default initialization / Reset
-    // Player Names (read from input for flexibility if user typed before first "reset")
     players[0].name = player1NameInput.value.trim() || 'Player 1';
     players[1].name = player2NameInput.value.trim() || 'Player 2';
     players[2].name = player3NameInput.value.trim() || 'Player 3';
     players[3].name = player4NameInput.value.trim() || 'Player 4';
-    updateSummaryTableHeadersFromState(); // Update headers with potentially new names
+    updateSummaryTableHeadersFromState();
+    updatePlayerInputGroupHeaders(); // For game area headers
 
     currentRound = 0;
     players.forEach(player => {
         player.score = 0;
-        player.bid = 0; // bid/won are transient for the round, reset them
+        player.bid = 0; 
         player.won = 0;
     });
     gameActive = true;
-    summaryTableBody.innerHTML = ''; // Clear the summary table
+    summaryTableBody.innerHTML = ''; 
 
-    updateControlsBasedOnGameState(); // Enable controls
-    displayNextRoundInfo(); // Setup for round 1
-    saveGame(); // Save this fresh state
+    // Reset hidden inputs to 0 before setting up custom inputs
+    const allHiddenBidTrickInputs = document.querySelectorAll('.hidden-original-input');
+    allHiddenBidTrickInputs.forEach(input => input.value = "0");
+
+    setupCustomNumberInputs(); // Attaches listeners and sets display from hidden inputs
+    updateControlsBasedOnGameState(); 
+    displayNextRoundInfo(); // Sets round info, and should also reset custom displays via hidden inputs
+    saveGame(); 
 }
 
 // Helper function for showing errors
@@ -140,15 +235,20 @@ function displayNextRoundInfo() {
         const cardsForRound = roundCardsSequence[currentRound];
         roundInfoDisplay.textContent = `Round ${currentRound + 1} - ${cardsForRound} Card${cardsForRound > 1 ? 's' : ''}`;
 
-        // Clear previous bid/trick input values
-        player1BidInput.value = '';
-        player2BidInput.value = '';
-        player3BidInput.value = '';
-        player4BidInput.value = '';
-        player1TricksInput.value = '';
-        player2TricksInput.value = '';
-        player3TricksInput.value = '';
-        player4TricksInput.value = '';
+        // Clear previous bid/trick hidden input values and update their displays
+        const allHiddenBidTrickInputs = document.querySelectorAll('.hidden-original-input');
+        allHiddenBidTrickInputs.forEach(hiddenInput => {
+            hiddenInput.value = '0';
+            const displaySpan = document.getElementById(hiddenInput.id + '-display');
+            if (displaySpan) {
+                displaySpan.textContent = '0';
+            }
+        });
+        // Max value for trick inputs might change, so re-setup or update relevant parts if necessary
+        // For simplicity, setupCustomNumberInputs() is robust enough if called once,
+        // as it reads max value dynamically for tricks.
+        // If already setup, the event listeners will use the updated currentRound correctly.
+
     } else {
         endGame();
     }
