@@ -1,0 +1,8 @@
+{
+  "name": "PochaCounter",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "short_name": "PochaCounter",
+  "id": "pocha-1.0",
+  "description": "Contador de puntos del juego de la pocha."
+}
