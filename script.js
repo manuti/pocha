@@ -69,10 +69,10 @@ function updatePlayerNameInputsFromState() {
 }
 
 function updateSummaryTableHeadersFromState() {
-    summaryTableHeaders[2].textContent = `${players[0].name} (Bid/Won/Total)`;
-    summaryTableHeaders[3].textContent = `${players[1].name} (Bid/Won/Total)`;
-    summaryTableHeaders[4].textContent = `${players[2].name} (Bid/Won/Total)`;
-    summaryTableHeaders[5].textContent = `${players[3].name} (Bid/Won/Total)`;
+    summaryTableHeaders[2].textContent = `${players[0].name} (Bid/Won/Points/Total)`;
+    summaryTableHeaders[3].textContent = `${players[1].name} (Bid/Won/Points/Total)`;
+    summaryTableHeaders[4].textContent = `${players[2].name} (Bid/Won/Points/Total)`;
+    summaryTableHeaders[5].textContent = `${players[3].name} (Bid/Won/Points/Total)`;
 }
 
 function updateControlsBasedOnGameState() {
@@ -209,9 +209,11 @@ function handleSubmitRound() {
         players[i].won = tricks[i];
     }
 
-    //    - Calculate scores.
+    //    - Calculate scores and store round points.
     players.forEach(player => {
-        player.score += calculatePlayerScore(player.bid, player.won);
+        const roundPoints = calculatePlayerScore(player.bid, player.won);
+        player.roundPoints = roundPoints; // Store points for the current round
+        player.score += roundPoints;    // Add to total score
     });
 
     //    - Update summary table.
@@ -246,8 +248,9 @@ function updateSummaryTable() {
     players.forEach(player => {
         const playerCell = newRow.insertCell();
         // player.bid and player.won are from the round just completed
+        // player.roundPoints is the points for this specific round
         // player.score is the new total score
-        playerCell.textContent = `${player.bid} / ${player.won} / ${player.score}`;
+        playerCell.textContent = `${player.bid} / ${player.won} / ${player.roundPoints} / ${player.score}`;
     });
 }
 

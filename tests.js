@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     testSection('LocalStorage Save/Load Tests', function() {
         resetGameStateForTest();
-        initGame(true); // Start fresh, this also calls saveGame() for the initial state
+        initGame(true); // Start fresh, this also calls saveGame() for the initial state. Player names in headers are set by initGame.
 
         // Modify state
         players[0].name = "Tester1";
@@ -145,6 +145,12 @@ document.addEventListener('DOMContentLoaded', function() {
         initGame(false); // isReset = false
 
         assertEquals("MidGameP1", player1NameInput.value, "Player 1 name input should be updated from loaded state");
+        // Note: The header text for player names like "Player X (Bid/Won/Total)" is set by updateSummaryTableHeadersFromState in script.js
+        // This test primarily ensures that player names are loaded and that the function runs.
+        // The actual text of the header (Bid/Won/Total vs Bid/Won/Points/Total) is an index.html/script.js concern.
+        // However, tests.html was updated to ensure its static part matches index.html.
+        // script.js's updateSummaryTableHeadersFromState was updated in the previous step to include "/Points/"
+        assertEquals("MidGameP1 (Bid/Won/Points/Total)", summaryTableHeaders[2].textContent, "Player 1 header in summary table should reflect loaded name and new format.");
         assertEquals("Round 3 - 4 Cards", roundInfoDisplay.textContent, "Round info display should be updated for loaded game");
         assertTrue(submitRoundButton.disabled === false, "Submit button should be enabled for an active loaded game");
 
@@ -164,6 +170,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
         localStorage.removeItem(SAVE_KEY); // Clean up
     });
+
+    testSection('Summary Table Content Tests', function() {
+        resetGameStateForTest();
+        // Manually setup players as initGame(true) would set names in headers,
+        // but we want to test updateSummaryTable in isolation of full init.
+        players = [
+            { name: 'P1', score: 0, bid: 0, won: 0, roundPoints: 0 },
+            { name: 'P2', score: 0, bid: 0, won: 0, roundPoints: 0 },
+            { name: 'P3', score: 0, bid: 0, won: 0, roundPoints: 0 },
+            { name: 'P4', score: 0, bid: 0, won: 0, roundPoints: 0 }
+        ];
+        currentRound = 0; // First round
+
+        // Simulate round for Player 1 (P1)
+        let p1 = players[0];
+        p1.bid = 2;
+        p1.won = 2;
+        p1.roundPoints = calculatePlayerScore(p1.bid, p1.won); // Should be 5 + (3*2) = 11
+        p1.score += p1.roundPoints;
+
+        // Simulate round for Player 2 (P2) - different outcome
+        let p2 = players[1];
+        p2.bid = 1;
+        p2.won = 0;
+        p2.roundPoints = calculatePlayerScore(p2.bid, p2.won); // Should be -3 * abs(1-0) = -3
+        p2.score += p2.roundPoints;
+
+        updateSummaryTable(); // Populate the table body
+
+        const firstRowCells = summaryTableBody.rows[0].cells;
+        assertEquals("1", firstRowCells[0].textContent, "Round number should be 1");
+        assertEquals(roundCardsSequence[0].toString(), firstRowCells[1].textContent, `Cards for round 0 should be ${roundCardsSequence[0]}`);
+        assertEquals("2 / 2 / 11 / 11", firstRowCells[2].textContent, "Player 1 cell should display Bid/Won/RoundPoints/TotalScore");
+        assertEquals("1 / 0 / -3 / -3", firstRowCells[3].textContent, "Player 2 cell should display Bid/Won/RoundPoints/TotalScore");
+        assertEquals("0 / 0 / 0 / 0", firstRowCells[4].textContent, "Player 3 cell should display default 0s if not played");
+    });
+
 
     // --- Final Summary ---
     function logSummary() {
