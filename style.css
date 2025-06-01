@@ -22,7 +22,7 @@ h1, h2 {
 
 .player-inputs {
     display: flex;
-    flex-wrap: nowrap; /* Por defecto, no se envuelven */
+    flex-wrap: nowrap;
     gap: 0.5rem;
     justify-content: space-between;
     overflow-x: auto;
@@ -62,26 +62,15 @@ h1, h2 {
     display: block;
 }
 
-/* OLD: .control-group { margin-bottom: 0.8rem; } */
-/* Lo necesitamos para el layout base, pero el inline lo redefinirá en mobile */
 .control-group {
     margin-bottom: 0.8rem;
 }
 
-/* NEW: Estilo para los grupos de control en línea */
-.control-group-inline {
-    display: flex; /* Para que label y controls estén en la misma línea */
-    justify-content: space-between; /* Espacio entre label y controls */
-    align-items: center;
-    margin-bottom: 0.6rem; /* Margen entre el grupo de apuesta y el de ganadas */
-}
-
 .control-group label {
-    display: block; /* Sigue siendo block por defecto para el layout original */
+    display: block;
     font-weight: bold;
-    margin-bottom: 0.3rem; /* Sigue siendo default */
+    margin-bottom: 0.3rem;
     font-size: 0.9rem;
-    /* Ajustes específicos para el layout inline en mobile */
 }
 
 .control-group .controls {
@@ -135,7 +124,7 @@ h1, h2 {
 .scoreboard {
     margin-top: 2rem;
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Centra los bloques de ronda */
     align-items: flex-start;
     flex-wrap: wrap;
 }
@@ -147,7 +136,8 @@ h1, h2 {
     overflow: hidden;
     background-color: #3c6b44;
     width: 100%;
-    max-width: 500px;
+    max-width: 500px; /* Mantener un ancho máximo para la tabla en escritorio */
+    /* Añadimos un contenedor para el scroll si la tabla es más ancha que el round-block */
     overflow-x: auto;
 }
 
@@ -161,28 +151,36 @@ h1, h2 {
 }
 
 .round-table {
-    width: 100%;
+    width: 100%; /* La tabla ocupará el 100% del round-block (que puede tener scroll) */
     border-collapse: collapse;
     background-color: #3c6b44;
-    table-layout: fixed;
-    min-width: 450px;
+    table-layout: fixed; /* ¡Importante! Fija el diseño de la tabla */
+    min-width: 450px; /* Ancho mínimo para la tabla si todas las columnas son iguales */
 }
 
 .round-table th,
 .round-table td {
-    padding: 0.4rem 0.1rem;
+    padding: 0.4rem 0.1rem; /* Más padding vertical, menos horizontal */
     text-align: center;
     border-bottom: 1px solid #598c5c;
-    font-size: 1.1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.1rem; /* Tamaño de fuente más grande por defecto */
+    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    overflow: hidden; /* Oculta cualquier contenido que se desborde */
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
 }
 
-.round-table th,
-.round-table td {
-    width: 20%;
+/* Ajuste específico para la primera columna (Jugador) si es necesario */
+.round-table th:first-child,
+.round-table td:first-child {
+    width: 25%; /* Dale un poco más de espacio al nombre del jugador si se prefiere */
 }
+/* Reajustamos las otras columnas para que sumen 100% */
+.round-table th:not(:first-child),
+.round-table td:not(:first-child) {
+    width: 18.75%; /* (100% - 25%) / 4 = 75% / 4 = 18.75% */
+}
+
 
 .round-table thead {
     background-color: #4e7c57;
@@ -210,80 +208,36 @@ h1, h2 {
 /* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
 /* ------------------------------------------------------------- */
 @media (max-width: 600px) {
-    /* Ajustes para el contenedor principal en móviles para dar más espacio */
-    .container {
-        padding: 0.5rem; /* Mantener padding reducido */
-    }
-
-    /* Player Inputs: Las tarjetas se envuelven en 2 columnas */
-    .player-inputs {
-        flex-wrap: wrap; /* ¡Ahora sí, envuelven! */
-        justify-content: center; /* Centra las filas */
-        gap: 0.75rem; /* Aumentamos ligeramente el gap entre tarjetas para mejor separación */
-        overflow-x: hidden; /* No scroll horizontal aquí si envuelven */
-    }
-
-    /* Player Card: Ajuste de ancho para 2 por fila */
     .player-card {
-        flex: 0 1 45%; /* Dos tarjetas por fila (45% + 45% + gap < 100%) */
-        min-width: 150px; /* Ancho mínimo decente para cada tarjeta */
-        max-width: 170px; /* Ancho máximo para que no se estiren demasiado */
-        padding: 0.6rem; /* Más padding interno para "aire" */
+        flex: 0 0 24%;
+        min-width: 80px;
+        max-width: 90px;
+        padding: 0.5rem;
     }
 
     .player-card h3 {
-        margin-bottom: 0.5rem; /* Espacio debajo del nombre */
+        font-size: 0.9rem;
     }
     .player-card input.player-name {
-        font-size: 0.9rem; /* Volvemos a un tamaño más legible para el nombre */
-        padding: 0.2rem 0.5rem; /* Más padding para el input del nombre */
-    }
-    
-    /* Control Group: Nuevo layout para Apuestas y Ganadas */
-    /* El control-group original ya no es display:block para label */
-    .control-group-inline label {
-        display: inline-block; /* La etiqueta se pone en línea */
-        margin-bottom: 0; /* Quitar margen inferior si el label está en línea */
-        font-size: 0.9rem; /* Tamaño legible para "Apuesta" y "Ganadas" */
-        min-width: 60px; /* Asegura un ancho mínimo para la etiqueta */
-        text-align: left; /* Alinea el texto a la izquierda en su min-width */
+        font-size: 0.9rem;
     }
 
-    .control-group-inline .controls {
-        flex-grow: 1; /* Permite que los controles ocupen el espacio restante */
-        justify-content: flex-end; /* Alinea los botones y el valor a la derecha */
-        gap: 0.3rem; /* Espacio entre botones/valor */
-    }
-
-    .control-group button {
-        padding: 0.4rem 0.6rem; /* Volvemos a los tamaños originales de botones */
-        font-size: 1rem;
-        min-width: 28px;
-    }
-    .control-group .value {
-        font-size: 1rem; /* Volvemos al tamaño original de los valores */
-        min-width: 1.5rem;
-    }
-
-    /* Resumen de rondas: tabla - Mantener como está, ya se ve bien */
+    /* Ajustes para la tabla en móviles: más estrecha y tipografía aún más grande */
     .round-block {
-        max-width: 98%;
-        margin-left: auto;
-        margin-right: auto;
+        max-width: 100%; /* Ocupa todo el ancho disponible del contenedor padre */
     }
 
     .round-table {
-        min-width: 360px;
-        width: 100%;
+        min-width: 400px; /* Reducimos el ancho mínimo para móviles, pero aún permite scroll */
     }
 
     .round-table th,
     .round-table td {
-        font-size: 1.0rem;
-        padding: 0.2rem 0.05rem;
-        width: 20%;
+        font-size: 1.2rem; /* Tipografía grande para móviles */
+        padding: 0.35rem 0.05rem; /* Más padding vertical, muy poco horizontal */
+        /* Las anchuras porcentuales se mantienen, asegurando igualdad */
     }
-    
+
     /* Para el botón de "Guardar Ronda" en móviles */
     #next-round {
         width: 90%;
