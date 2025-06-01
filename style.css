@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    max-width: 700px; /* Mantener el ancho máximo para el contenedor principal */
+    max-width: 700px;
     margin: auto;
     background-color: #2f5335;
     padding: 1.5rem;
@@ -22,31 +22,30 @@ h1, h2 {
 
 .player-inputs {
     display: flex;
-    flex-wrap: wrap; /* Hacemos que se envuelvan por defecto en la mayoría de los casos */
-    gap: 0.75rem; /* Gap por defecto para una buena separación */
-    justify-content: center; /* Centrar las tarjetas */
-    overflow-x: hidden; /* No scroll horizontal si se envuelven */
+    flex-wrap: nowrap; /* Por defecto, no se envuelven */
+    gap: 0.5rem;
+    justify-content: space-between;
+    overflow-x: auto;
     margin-bottom: 2rem;
-    padding-bottom: 0; /* No necesitamos padding-bottom si no hay overflow-x */
+    padding-bottom: 0.5rem;
 }
 
-/* Tarjetas de jugador - Ajustes generales para adaptarse a 2 por fila si el espacio es limitado */
 .player-card {
     background-color: #3c6b44;
     border: 2px solid #598c5c;
     border-radius: 8px;
-    padding: 0.6rem; /* Padding interno por defecto para tarjetas */
+    padding: 0.8rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    flex: 0 1 45%; /* Dos tarjetas por fila por defecto */
-    min-width: 150px; /* Ancho mínimo para que se vean bien */
-    max-width: 170px; /* Ancho máximo para que no se estiren demasiado */
+    flex: 0 0 auto;
+    min-width: 100px;
+    max-width: 120px;
 }
 
 .player-card h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
     color: #fff;
-    font-size: 0.95rem; /* Ajuste sutil del nombre del jugador */
+    font-size: 1rem;
 }
 
 .player-card input.player-name {
@@ -54,7 +53,7 @@ h1, h2 {
     background-color: #2f5335;
     color: #fff;
     border: none;
-    font-size: 0.95rem; /* Ajuste sutil del input del nombre del jugador */
+    font-size: 1rem;
     font-weight: bold;
     text-align: center;
     border-radius: 4px;
@@ -63,38 +62,40 @@ h1, h2 {
     display: block;
 }
 
-/* OLD: .control-group - Deshabilitado porque usamos -inline ahora */
-/* .control-group { margin-bottom: 0.8rem; } */
+/* OLD: .control-group { margin-bottom: 0.8rem; } */
+/* Lo necesitamos para el layout base, pero el inline lo redefinirá en mobile */
+.control-group {
+    margin-bottom: 0.8rem;
+}
 
 /* NEW: Estilo para los grupos de control en línea */
 .control-group-inline {
     display: flex; /* Para que label y controls estén en la misma línea */
+    justify-content: space-between; /* Espacio entre label y controls */
     align-items: center;
     margin-bottom: 0.6rem; /* Margen entre el grupo de apuesta y el de ganadas */
-    /* Alinea el contenido a la izquierda y los botones a la derecha */
-    justify-content: space-between; 
 }
 
-.control-group-inline label {
+.control-group label {
+    display: block; /* Sigue siendo block por defecto para el layout original */
     font-weight: bold;
-    font-size: 0.9rem; /* Tamaño legible para "Apuesta" y "Ganadas" */
-    white-space: nowrap; /* Evita que el texto se rompa */
-    margin-right: 0.5rem; /* Espacio entre el texto y los botones */
+    margin-bottom: 0.3rem; /* Sigue siendo default */
+    font-size: 0.9rem;
+    /* Ajustes específicos para el layout inline en mobile */
 }
 
-.control-group-inline .controls {
+.control-group .controls {
     display: flex;
-    gap: 0.3rem; /* Espacio entre los botones y el valor */
+    gap: 0.3rem;
     align-items: center;
-    justify-content: flex-end; /* Alinea los botones a la derecha del todo en su espacio */
-    flex-grow: 1; /* Permite que los controles ocupen el espacio restante */
+    justify-content: center;
 }
 
 .control-group button {
-    background-color: #d6ad60; /* Color amarillo/dorado original */
+    background-color: #d6ad60;
     border: none;
     padding: 0.4rem 0.6rem;
-    font-size: 1rem;
+    font-size: 1rem; /* Mantenemos este tamaño */
     border-radius: 6px;
     color: #1e4022;
     font-weight: bold;
@@ -103,13 +104,13 @@ h1, h2 {
 }
 
 .control-group button:hover {
-    background-color: #eac77a; /* Color de hover más claro */
+    background-color: #eac77a;
 }
 
 .control-group .value {
     min-width: 1.5rem;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1rem; /* Mantenemos este tamaño */
     font-weight: bold;
 }
 
@@ -117,7 +118,7 @@ h1, h2 {
     background-color: #d6ad60;
     border: none;
     padding: 0.8rem 1.5rem;
-    font-size: 1.1rem;
+    font-size: 1.1rem; /* Mantenemos este tamaño */
     border-radius: 8px;
     color: #1e4022;
     font-weight: bold;
@@ -141,4 +142,152 @@ h1, h2 {
 
 .round-block {
     margin-bottom: 2rem;
-    border: 2
+    border: 2px solid #598c5c;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #3c6b44;
+    width: 100%;
+    max-width: 500px;
+    overflow-x: auto;
+}
+
+.round-label {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin: 0;
+    padding: 0.8rem;
+    background-color: #4e7c57;
+}
+
+.round-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #3c6b44;
+    table-layout: fixed;
+    min-width: 450px;
+}
+
+.round-table th,
+.round-table td {
+    padding: 0.4rem 0.1rem;
+    text-align: center;
+    border-bottom: 1px solid #598c5c;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.round-table th,
+.round-table td {
+    width: 20%;
+}
+
+.round-table thead {
+    background-color: #4e7c57;
+}
+
+.round-table th {
+    font-weight: bold;
+    color: #fff;
+}
+
+.round-table td.total {
+    font-weight: bold;
+    color: #f6e27a;
+}
+
+.current-round-header {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+/* ------------------------------------------------------------- */
+/* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
+/* ------------------------------------------------------------- */
+@media (max-width: 600px) {
+    /* Ajustes para el contenedor principal en móviles para dar más espacio */
+    .container {
+        padding: 0.5rem; /* Mantener padding reducido */
+    }
+
+    /* Player Inputs: Las tarjetas se envuelven en 2 columnas */
+    .player-inputs {
+        flex-wrap: wrap; /* ¡Ahora sí, envuelven! */
+        justify-content: center; /* Centra las filas */
+        gap: 0.75rem; /* Aumentamos ligeramente el gap entre tarjetas para mejor separación */
+        overflow-x: hidden; /* No scroll horizontal aquí si envuelven */
+    }
+
+    /* Player Card: Ajuste de ancho para 2 por fila */
+    .player-card {
+        flex: 0 1 45%; /* Dos tarjetas por fila (45% + 45% + gap < 100%) */
+        min-width: 150px; /* Ancho mínimo decente para cada tarjeta */
+        max-width: 170px; /* Ancho máximo para que no se estiren demasiado */
+        padding: 0.6rem; /* Más padding interno para "aire" */
+    }
+
+    .player-card h3 {
+        margin-bottom: 0.5rem; /* Espacio debajo del nombre */
+    }
+    .player-card input.player-name {
+        font-size: 0.9rem; /* Volvemos a un tamaño más legible para el nombre */
+        padding: 0.2rem 0.5rem; /* Más padding para el input del nombre */
+    }
+    
+    /* Control Group: Nuevo layout para Apuestas y Ganadas */
+    /* El control-group original ya no es display:block para label */
+    .control-group-inline label {
+        display: inline-block; /* La etiqueta se pone en línea */
+        margin-bottom: 0; /* Quitar margen inferior si el label está en línea */
+        font-size: 0.9rem; /* Tamaño legible para "Apuesta" y "Ganadas" */
+        min-width: 60px; /* Asegura un ancho mínimo para la etiqueta */
+        text-align: left; /* Alinea el texto a la izquierda en su min-width */
+    }
+
+    .control-group-inline .controls {
+        flex-grow: 1; /* Permite que los controles ocupen el espacio restante */
+        justify-content: flex-end; /* Alinea los botones y el valor a la derecha */
+        gap: 0.3rem; /* Espacio entre botones/valor */
+    }
+
+    .control-group button {
+        padding: 0.4rem 0.6rem; /* Volvemos a los tamaños originales de botones */
+        font-size: 1rem;
+        min-width: 28px;
+    }
+    .control-group .value {
+        font-size: 1rem; /* Volvemos al tamaño original de los valores */
+        min-width: 1.5rem;
+    }
+
+    /* Resumen de rondas: tabla - Mantener como está, ya se ve bien */
+    .round-block {
+        max-width: 98%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .round-table {
+        min-width: 360px;
+        width: 100%;
+    }
+
+    .round-table th,
+    .round-table td {
+        font-size: 1.0rem;
+        padding: 0.2rem 0.05rem;
+        width: 20%;
+    }
+    
+    /* Para el botón de "Guardar Ronda" en móviles */
+    #next-round {
+        width: 90%;
+        max-width: 300px;
+        font-size: 1.1rem;
+    }
+}
