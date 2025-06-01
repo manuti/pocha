@@ -1,4 +1,4 @@
-body {
+kbody {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
     background-color: #1e4022;
@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    max-width: 700px;
+    max-width: 700px; /* Mantener el ancho máximo para el contenedor principal */
     margin: auto;
     background-color: #2f5335;
     padding: 1.5rem;
@@ -22,30 +22,31 @@ h1, h2 {
 
 .player-inputs {
     display: flex;
-    flex-wrap: nowrap; /* Por defecto, no se envuelven */
-    gap: 0.5rem;
-    justify-content: space-between;
-    overflow-x: auto;
+    flex-wrap: wrap; /* Hacemos que se envuelvan por defecto en la mayoría de los casos */
+    gap: 0.75rem; /* Gap por defecto para una buena separación */
+    justify-content: center; /* Centrar las tarjetas */
+    overflow-x: hidden; /* No scroll horizontal si se envuelven */
     margin-bottom: 2rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0; /* No necesitamos padding-bottom si no hay overflow-x */
 }
 
+/* Tarjetas de jugador - Ajustes generales para adaptarse a 2 por fila si el espacio es limitado */
 .player-card {
     background-color: #3c6b44;
     border: 2px solid #598c5c;
     border-radius: 8px;
-    padding: 0.8rem;
+    padding: 0.6rem; /* Padding interno por defecto para tarjetas */
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    flex: 0 0 auto;
-    min-width: 100px;
-    max-width: 120px;
+    flex: 0 1 45%; /* Dos tarjetas por fila por defecto */
+    min-width: 150px; /* Ancho mínimo para que se vean bien */
+    max-width: 170px; /* Ancho máximo para que no se estiren demasiado */
 }
 
 .player-card h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
     color: #fff;
-    font-size: 1rem;
+    font-size: 0.95rem; /* Ajuste sutil del nombre del jugador */
 }
 
 .player-card input.player-name {
@@ -53,7 +54,7 @@ h1, h2 {
     background-color: #2f5335;
     color: #fff;
     border: none;
-    font-size: 1rem;
+    font-size: 0.95rem; /* Ajuste sutil del input del nombre del jugador */
     font-weight: bold;
     text-align: center;
     border-radius: 4px;
@@ -62,40 +63,38 @@ h1, h2 {
     display: block;
 }
 
-/* OLD: .control-group { margin-bottom: 0.8rem; } */
-/* Lo necesitamos para el layout base, pero el inline lo redefinirá en mobile */
-.control-group {
-    margin-bottom: 0.8rem;
-}
+/* OLD: .control-group - Deshabilitado porque usamos -inline ahora */
+/* .control-group { margin-bottom: 0.8rem; } */
 
 /* NEW: Estilo para los grupos de control en línea */
 .control-group-inline {
     display: flex; /* Para que label y controls estén en la misma línea */
-    justify-content: space-between; /* Espacio entre label y controls */
     align-items: center;
     margin-bottom: 0.6rem; /* Margen entre el grupo de apuesta y el de ganadas */
+    /* Alinea el contenido a la izquierda y los botones a la derecha */
+    justify-content: space-between; 
 }
 
-.control-group label {
-    display: block; /* Sigue siendo block por defecto para el layout original */
+.control-group-inline label {
     font-weight: bold;
-    margin-bottom: 0.3rem; /* Sigue siendo default */
-    font-size: 0.9rem;
-    /* Ajustes específicos para el layout inline en mobile */
+    font-size: 0.9rem; /* Tamaño legible para "Apuesta" y "Ganadas" */
+    white-space: nowrap; /* Evita que el texto se rompa */
+    margin-right: 0.5rem; /* Espacio entre el texto y los botones */
 }
 
-.control-group .controls {
+.control-group-inline .controls {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.3rem; /* Espacio entre los botones y el valor */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end; /* Alinea los botones a la derecha del todo en su espacio */
+    flex-grow: 1; /* Permite que los controles ocupen el espacio restante */
 }
 
 .control-group button {
-    background-color: #d6ad60;
+    background-color: #d6ad60; /* Color amarillo/dorado original */
     border: none;
     padding: 0.4rem 0.6rem;
-    font-size: 1rem; /* Mantenemos este tamaño */
+    font-size: 1rem;
     border-radius: 6px;
     color: #1e4022;
     font-weight: bold;
@@ -104,13 +103,13 @@ h1, h2 {
 }
 
 .control-group button:hover {
-    background-color: #eac77a;
+    background-color: #eac77a; /* Color de hover más claro */
 }
 
 .control-group .value {
     min-width: 1.5rem;
     text-align: center;
-    font-size: 1rem; /* Mantenemos este tamaño */
+    font-size: 1rem;
     font-weight: bold;
 }
 
@@ -118,7 +117,7 @@ h1, h2 {
     background-color: #d6ad60;
     border: none;
     padding: 0.8rem 1.5rem;
-    font-size: 1.1rem; /* Mantenemos este tamaño */
+    font-size: 1.1rem;
     border-radius: 8px;
     color: #1e4022;
     font-weight: bold;
@@ -147,8 +146,8 @@ h1, h2 {
     overflow: hidden;
     background-color: #3c6b44;
     width: 100%;
-    max-width: 500px;
-    overflow-x: auto;
+    max-width: 500px; /* Mantener un ancho máximo para la tabla en escritorio */
+    overflow-x: auto; /* Para permitir el scroll si la tabla es más ancha que el round-block */
 }
 
 .round-label {
@@ -165,23 +164,19 @@ h1, h2 {
     border-collapse: collapse;
     background-color: #3c6b44;
     table-layout: fixed;
-    min-width: 450px;
+    min-width: 380px; /* Ajustamos el min-width de la tabla para que quepa mejor en portrait */
 }
 
 .round-table th,
 .round-table td {
-    padding: 0.4rem 0.1rem;
+    padding: 0.4rem 0.1rem; /* Más padding vertical, menos horizontal */
     text-align: center;
     border-bottom: 1px solid #598c5c;
-    font-size: 1.1rem;
+    font-size: 1.1rem; /* Tamaño de fuente por defecto */
+    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.round-table th,
-.round-table td {
-    width: 20%;
 }
 
 .round-table thead {
@@ -207,65 +202,57 @@ h1, h2 {
 }
 
 /* ------------------------------------------------------------- */
-/* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
+/* AJUSTES RESPONSIVE PARA DISPOSITIVOS PEQUEÑOS Y MODOS APAISADOS */
+/* Ahora se aplican hasta 768px de ancho, cubriendo la mayoría de móviles en portrait y landscape */
 /* ------------------------------------------------------------- */
-@media (max-width: 600px) {
-    /* Ajustes para el contenedor principal en móviles para dar más espacio */
+@media (max-width: 768px) {
     .container {
-        padding: 0.5rem; /* Mantener padding reducido */
+        padding: 0.5rem; /* Reducimos el padding general del contenedor */
     }
 
-    /* Player Inputs: Las tarjetas se envuelven en 2 columnas */
+    /* Player Inputs: Las tarjetas siempre se envuelven en dos columnas para anchos pequeños/medianos */
     .player-inputs {
-        flex-wrap: wrap; /* ¡Ahora sí, envuelven! */
-        justify-content: center; /* Centra las filas */
-        gap: 0.75rem; /* Aumentamos ligeramente el gap entre tarjetas para mejor separación */
-        overflow-x: hidden; /* No scroll horizontal aquí si envuelven */
+        flex-wrap: wrap; /* Aseguramos que se envuelvan */
+        justify-content: center; /* Centramos si hay pocas */
+        gap: 0.75rem; /* Mantener el gap */
     }
 
     /* Player Card: Ajuste de ancho para 2 por fila */
     .player-card {
         flex: 0 1 45%; /* Dos tarjetas por fila (45% + 45% + gap < 100%) */
-        min-width: 150px; /* Ancho mínimo decente para cada tarjeta */
-        max-width: 170px; /* Ancho máximo para que no se estiren demasiado */
+        min-width: 140px; /* Ancho mínimo para que se vean bien */
+        max-width: 180px; /* Ancho máximo para que no se estiren demasiado */
         padding: 0.6rem; /* Más padding interno para "aire" */
     }
 
     .player-card h3 {
-        margin-bottom: 0.5rem; /* Espacio debajo del nombre */
+        margin-bottom: 0.5rem;
     }
     .player-card input.player-name {
-        font-size: 0.9rem; /* Volvemos a un tamaño más legible para el nombre */
-        padding: 0.2rem 0.5rem; /* Más padding para el input del nombre */
+        font-size: 0.9rem; /* Tamaño legible para el nombre */
+        padding: 0.2rem 0.5rem;
     }
     
-    /* Control Group: Nuevo layout para Apuestas y Ganadas */
-    /* El control-group original ya no es display:block para label */
-    .control-group-inline label {
-        display: inline-block; /* La etiqueta se pone en línea */
-        margin-bottom: 0; /* Quitar margen inferior si el label está en línea */
-        font-size: 0.9rem; /* Tamaño legible para "Apuesta" y "Ganadas" */
-        min-width: 60px; /* Asegura un ancho mínimo para la etiqueta */
-        text-align: left; /* Alinea el texto a la izquierda en su min-width */
+    /* Control Group Inline: Ajustes finos */
+    .control-group-inline {
+        margin-bottom: 0.4rem; /* Menos margen entre lineas de control */
     }
-
-    .control-group-inline .controls {
-        flex-grow: 1; /* Permite que los controles ocupen el espacio restante */
-        justify-content: flex-end; /* Alinea los botones y el valor a la derecha */
-        gap: 0.3rem; /* Espacio entre botones/valor */
+    .control-group-inline label {
+        font-size: 0.85rem; /* Ajuste sutil para "Apuesta" y "Ganadas" */
+        margin-right: 0.3rem; /* Menos espacio entre texto y botones */
     }
 
     .control-group button {
-        padding: 0.4rem 0.6rem; /* Volvemos a los tamaños originales de botones */
-        font-size: 1rem;
-        min-width: 28px;
+        padding: 0.3rem 0.5rem; /* Ajuste de padding de los botones para ser más compactos */
+        font-size: 0.9rem; /* Ajuste de tamaño de fuente de los botones */
+        min-width: 26px; /* Ajuste de ancho mínimo de los botones */
     }
     .control-group .value {
-        font-size: 1rem; /* Volvemos al tamaño original de los valores */
-        min-width: 1.5rem;
+        font-size: 0.9rem; /* Ajuste de tamaño de fuente de los valores */
+        min-width: 1.2rem; /* Ajuste de ancho mínimo de los valores */
     }
 
-    /* Resumen de rondas: tabla - Mantener como está, ya se ve bien */
+    /* Resumen de rondas: tabla */
     .round-block {
         max-width: 98%;
         margin-left: auto;
@@ -273,7 +260,7 @@ h1, h2 {
     }
 
     .round-table {
-        min-width: 360px;
+        min-width: 360px; /* Mantenemos el ancho mínimo para la tabla */
         width: 100%;
     }
 
@@ -284,7 +271,6 @@ h1, h2 {
         width: 20%;
     }
     
-    /* Para el botón de "Guardar Ronda" en móviles */
     #next-round {
         width: 90%;
         max-width: 300px;
