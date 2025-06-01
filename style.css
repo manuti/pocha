@@ -23,9 +23,9 @@ h1, h2 {
 .player-inputs {
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: 0.5rem; /* Mantener el gap entre tarjetas */
     justify-content: space-between;
-    overflow-x: auto;
+    overflow-x: auto; /* Mantener scroll horizontal si es inevitable */
     margin-bottom: 2rem;
     padding-bottom: 0.5rem;
 }
@@ -34,10 +34,10 @@ h1, h2 {
     background-color: #3c6b44;
     border: 2px solid #598c5c;
     border-radius: 8px;
-    padding: 0.8rem;
+    padding: 0.8rem; /* Mantener padding por defecto */
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     flex: 0 0 auto;
-    min-width: 100px;
+    min-width: 100px; /* Mantener los valores base para pantallas más grandes */
     max-width: 120px;
 }
 
@@ -137,7 +137,7 @@ h1, h2 {
     background-color: #3c6b44;
     width: 100%;
     max-width: 500px;
-    overflow-x: auto; /* Para permitir el scroll si la tabla es demasiado ancha */
+    overflow-x: auto;
 }
 
 .round-label {
@@ -154,7 +154,7 @@ h1, h2 {
     border-collapse: collapse;
     background-color: #3c6b44;
     table-layout: fixed;
-    min-width: 450px; /* Base width for all columns equal */
+    min-width: 450px;
 }
 
 .round-table th,
@@ -171,11 +171,8 @@ h1, h2 {
 /* Base column widths - adjusted for 5 columns */
 .round-table th,
 .round-table td {
-    width: 20%; /* 100% / 5 columns */
+    width: 20%;
 }
-
-/* No aplicar anchos especiales a la primera columna por defecto, para que todas sean iguales */
-
 
 .round-table thead {
     background-color: #4e7c57;
@@ -205,56 +202,61 @@ h1, h2 {
 @media (max-width: 600px) {
     /* Ajustes para el contenedor principal en móviles para dar más espacio */
     .container {
-        padding: 0.8rem; /* Reducimos el padding general del contenedor */
+        padding: 0.5rem; /* Reducimos el padding general del contenedor AÚN MÁS */
     }
 
-    /* Tarjetas de jugador más estrechas */
+    /* Tarjetas de jugador AÚN MÁS estrechas y con ajustes de tipografía */
     .player-card {
-        flex: 0 0 23%; /* Ligeramente más estrechas para que quepan 4 */
-        min-width: 75px; /* Reducimos el mínimo */
-        max-width: 85px; /* Reducimos el máximo */
-        padding: 0.4rem; /* Reducimos el padding interno de la tarjeta */
+        flex: 0 0 22%; /* Un poco más estrechas */
+        min-width: 70px; /* Reducimos el mínimo */
+        max-width: 80px; /* Reducimos el máximo */
+        padding: 0.3rem; /* Reducimos el padding interno de la tarjeta */
     }
 
     .player-card h3 {
-        font-size: 0.8rem; /* Reducimos la tipografía del nombre del jugador un poco */
+        margin-bottom: 0.3rem; /* Menos espacio entre título y controles */
     }
     .player-card input.player-name {
-        font-size: 0.8rem; /* Reducimos la tipografía del input del nombre del jugador un poco */
-        padding: 0.1rem 0.2rem; /* Reducimos el padding del input */
+        font-size: 0.75rem; /* Reducimos la tipografía del nombre del jugador para que quepa */
+        padding: 0.1rem; /* Reducimos el padding del input */
+    }
+    .control-group {
+        margin-bottom: 0.6rem; /* Menos margen entre grupos de control */
     }
     .control-group label {
-        font-size: 0.8rem; /* Reducimos la tipografía de "Apuesta" y "Ganadas" un poco */
+        font-size: 0.7rem; /* Reducimos la tipografía de "Apuesta" y "Ganadas" */
+        margin-bottom: 0.2rem; /* Menos margen debajo de la etiqueta */
+    }
+    .control-group .controls {
+        gap: 0.2rem; /* Reducimos el espacio entre los botones y el valor */
     }
     .control-group button {
-        padding: 0.3rem 0.5rem; /* Reducimos el padding de los botones un poco */
-        font-size: 0.9rem; /* Reducimos la tipografía de los botones un poco */
-        min-width: 24px; /* Ajustamos el min-width del botón */
+        padding: 0.25rem 0.4rem; /* Reducimos el padding de los botones */
+        font-size: 0.8rem; /* Reducimos la tipografía de los botones */
+        min-width: 22px; /* Ajustamos el min-width del botón */
     }
     .control-group .value {
-        font-size: 0.9rem; /* Reducimos la tipografía de los valores (0) un poco */
-        min-width: 1.2rem; /* Ajustamos el min-width del valor */
+        font-size: 0.8rem; /* Reducimos la tipografía de los valores (0) */
+        min-width: 1.0rem; /* Ajustamos el min-width del valor */
     }
 
-
-    /* Resumen de rondas: tabla */
+    /* Resumen de rondas: tabla - Mantener como está, ya se ve bien */
     .round-block {
-        max-width: 95%; /* Hacemos que el bloque de la tabla sea un poco más ancho, 95% del contenedor */
-        margin-left: auto; /* Centrar el bloque */
-        margin-right: auto; /* Centrar el bloque */
+        max-width: 98%; /* Asegurarse de que el bloque tenga casi todo el ancho disponible */
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .round-table {
-        min-width: 380px; /* Reducimos el ancho mínimo de la tabla, ajustado para caber mejor */
-        /* Aseguramos que la tabla completa se ajuste al 100% de su contenedor scrollable */
-        width: 100%; 
+        min-width: 360px; /* Posiblemente este sea el ancho mínimo del dispositivo, para que quepa sin scroll */
+        width: 100%;
     }
 
     .round-table th,
     .round-table td {
-        font-size: 1.0rem; /* Mantenemos una buena tipografía, pero no tan grande como 1.2rem para que quepa */
-        padding: 0.2rem 0.05rem; /* Más padding vertical, muy poco horizontal para juntar al máximo */
-        width: 20%; /* Asegura que todas las columnas sean igual de anchas */
+        font-size: 1.0rem;
+        padding: 0.2rem 0.05rem;
+        width: 20%;
     }
     
     /* Para el botón de "Guardar Ronda" en móviles */
