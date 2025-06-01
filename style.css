@@ -1,342 +1,247 @@
 body {
-    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Quicksand', sans-serif;
+    background-color: #1e4022;
+    color: #fff;
+    padding: 1rem;
 }
 
 .container {
-    max-width: 900px;
+    max-width: 700px;
     margin: auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #2f5335;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
 h1, h2 {
-    color: #333;
-    margin-bottom: 0.7em;
-}
-
-h1 {
     text-align: center;
-    margin-bottom: 1em;
-    color: #2c3e50;
+    color: #eac77a;
 }
 
-h2 {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 0.3em;
-    color: #34495e;
-}
-
-/* Sections */
-#player-setup, #game-area, #game-summary {
-    margin-bottom: 25px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-
-#bids-input, #tricks-input {
-    margin-bottom: 15px;
-    padding-top: 10px;
-}
-
-
-#player-setup label,
-#bids-input label,
-#tricks-input label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-
-input[type="text"],
-input[type="number"] {
-    width: calc(100% - 24px); /* Account for padding and border */
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1em;
-}
-
-/* Player setup specific layout (Flexbox for side-by-side) */
-#player-setup {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-#player-setup > div { /* Assuming each input is wrapped in a div if more structure is needed, or directly style inputs */
-    /* No extra styling needed if inputs are direct children and grid handles layout */
-}
-
-
-/* Buttons */
-button {
-    display: inline-block;
-    background: #3498db; /* Primary button color */
-    color: #fff;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-    margin-right: 10px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background: #2980b9;
-}
-
-#submit-round-button {
-    background: #2ecc71; /* Green for submit */
-}
-#submit-round-button:hover {
-    background: #27ae60;
-}
-
-#reset-game-button {
-    background: #e74c3c; /* Red for reset */
-}
-
-#reset-game-button:hover {
-    background: #c0392b;
-}
-
-/* Round Info */
-#round-info {
-    font-size: 1.3em;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 25px;
-    padding: 12px;
-    background-color: #eaf5ff;
-    border-left: 5px solid #3498db;
-    color: #2c3e50;
-}
-
-/* Game Summary Table */
-#summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-#summary-table th,
-#summary-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-}
-
-#summary-table th {
-    background-color: #ecf0f1;
-    font-weight: bold;
-    color: #34495e;
-}
-
-#summary-table tbody tr:nth-child(even) {
-    background-color: #fdfdfd;
-}
-#summary-table tbody tr:hover {
-    background-color: #f0f0f0;
-}
-
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 15px;
-    }
-
-    #player-setup {
-        grid-template-columns: 1fr; /* Stack player inputs on smaller screens */
-    }
-
-    input[type="text"],
-    input[type="number"] {
-        width: calc(100% - 20px); /* Adjust for smaller padding if any */
-    }
-
-    button {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    #summary-table {
-        display: block;
-        overflow-x: auto; /* Enable horizontal scrolling for the table */
-        white-space: nowrap;
-    }
-    #summary-table th,
-    #summary-table td {
-        min-width: 100px; /* Ensure columns have a minimum width */
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.8em;
-    }
-    h2 {
-        font-size: 1.3em;
-    }
-    #round-info {
-        font-size: 1.1em;
-    }
-    button {
-        padding: 10px 15px;
-        font-size: 0.9em;
-    }
-    #summary-table th,
-    #summary-table td {
-        padding: 8px;
-        min-width: 80px;
-    }
-
-    /* Custom number input buttons might need slightly adjusted padding for very small screens */
-    .custom-number-input button {
-        padding: 8px 10px;
-    }
-    .custom-number-input .value-display {
-        padding: 6px 8px;
-        min-width: 2em;
-    }
-
-    .player-input-group .input-row {
-        flex-direction: column; /* Stack bid and tricks if row is too narrow */
-        gap: 10px;
-    }
-    .input-control-group {
-        min-width: 100%; /* Each control takes full width when stacked */
-    }
-}
-
-/* Custom Number Input Base Styles */
-.custom-number-input {
-    display: inline-flex; 
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    overflow: hidden; 
-}
-
-.custom-number-input button { 
-    background-color: #f0f0f0;
-    color: #333;
-    border: none;
-    padding: 10px 12px; 
-    cursor: pointer;
-    font-size: 1.2em; 
-    line-height: 1; 
-    /* Reset general button styles that might interfere */
-    margin: 0; 
-    width: auto; /* Override full-width from general button style on mobile */
-    border-radius: 0; /* Buttons are part of a larger component */
-}
-
-.custom-number-input button:hover {
-    background-color: #e0e0e0;
-}
-
-.custom-number-input .value-display {
-    padding: 8px 10px;
-    min-width: 2.5em; 
-    text-align: center;
-    font-size: 1em;
-    font-weight: bold;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    line-height: 1.2em; /* Match button line-height roughly */
-}
-
-.hidden-original-input {
-    display: none !important;
-}
-
-/* Player Round Inputs Layout Base Styles */
-/* Base styles (for wider screens) */
-#player-round-inputs {
+.player-inputs {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 20px; 
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
 }
 
-.player-input-group {
-    border: 1px solid #e0e0e0;
-    padding: 15px;
-    border-radius: 5px;
-    background-color: #fdfdfd;
-    flex-grow: 1;
-    flex-shrink: 1; 
-    flex-basis: calc(50% - 10px); /* (20px gap / 2) = 10px */
-    box-sizing: border-box; 
-    min-width: 280px; 
+.player-card {
+    background-color: #3c6b44;
+    border: 2px solid #598c5c;
+    border-radius: 8px;
+    padding: 0.8rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    flex: 0 0 auto;
+    min-width: 100px;
+    max-width: 120px;
 }
 
-.player-input-group .player-name-header {
+.player-card h3 {
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    color: #34495e;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    font-size: 1rem;
 }
 
-.player-input-group .input-row {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 20px; /* Increased gap for better spacing by default */
-}
-
-.input-control-group {
-    display: flex;
-    flex-direction: column;
-    flex: 1; 
-    min-width: 140px; /* Slightly larger min-width for better default */
-    align-items: flex-start; /* Add this line */
-}
-
-.input-control-group label {
-    margin-bottom: 8px;
+.player-card input.player-name {
+    width: calc(100% - 1rem);
+    background-color: #2f5335;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
     font-weight: bold;
-    color: #555;
+    text-align: center;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    margin: 0 auto;
+    display: block;
 }
 
-/* Removing old specific label styles that are now handled by .input-control-group label */
-#bids-input label,
-#tricks-input label {
-    display: none; /* Effectively remove them as they are replaced */
+.control-group {
+    margin-bottom: 0.8rem;
 }
 
-/* Removing old input container styles that are now replaced */
-#bids-input, #tricks-input {
-   margin-bottom: 0;
-   padding-top: 0;
-   border: none; /* Remove any borders if they existed */
+.control-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
 }
 
-/* Styles for smaller screens where player groups stack */
-@media (max-width: 700px) { 
-    #player-round-inputs {
-        flex-direction: column; /* Stack player groups vertically */
+.control-group .controls {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-group button {
+    background-color: #d6ad60;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem; /* Mantenemos este tamaño */
+    border-radius: 6px;
+    color: #1e4022;
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 28px;
+}
+
+.control-group button:hover {
+    background-color: #eac77a;
+}
+
+.control-group .value {
+    min-width: 1.5rem;
+    text-align: center;
+    font-size: 1rem; /* Mantenemos este tamaño */
+    font-weight: bold;
+}
+
+#next-round {
+    background-color: #d6ad60;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem; /* Mantenemos este tamaño */
+    border-radius: 8px;
+    color: #1e4022;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 2rem auto;
+}
+
+#next-round:hover {
+    background-color: #eac77a;
+}
+
+.scoreboard {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center; /* Centra los bloques de ronda */
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.round-block {
+    margin-bottom: 2rem;
+    border: 2px solid #598c5c;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #3c6b44;
+    width: 100%;
+    max-width: 500px; /* Mantener un ancho máximo para la tabla en escritorio */
+    /* Añadimos un contenedor para el scroll si la tabla es más ancha que el round-block */
+    overflow-x: auto;
+}
+
+.round-label {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin: 0;
+    padding: 0.8rem;
+    background-color: #4e7c57;
+}
+
+.round-table {
+    width: 100%; /* La tabla ocupará el 100% del round-block (que puede tener scroll) */
+    border-collapse: collapse;
+    background-color: #3c6b44;
+    table-layout: fixed; /* ¡Importante! Fija el diseño de la tabla */
+    min-width: 450px; /* Ancho mínimo para la tabla si todas las columnas son iguales */
+}
+
+.round-table th,
+.round-table td {
+    padding: 0.4rem 0.1rem; /* Más padding vertical, menos horizontal */
+    text-align: center;
+    border-bottom: 1px solid #598c5c;
+    font-size: 1.1rem; /* Tamaño de fuente más grande por defecto */
+    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    overflow: hidden; /* Oculta cualquier contenido que se desborde */
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+}
+
+/* Ajuste específico para la primera columna (Jugador) si es necesario */
+.round-table th:first-child,
+.round-table td:first-child {
+    width: 25%; /* Dale un poco más de espacio al nombre del jugador si se prefiere */
+}
+/* Reajustamos las otras columnas para que sumen 100% */
+.round-table th:not(:first-child),
+.round-table td:not(:first-child) {
+    width: 18.75%; /* (100% - 25%) / 4 = 75% / 4 = 18.75% */
+}
+
+
+.round-table thead {
+    background-color: #4e7c57;
+}
+
+.round-table th {
+    font-weight: bold;
+    color: #fff;
+}
+
+.round-table td.total {
+    font-weight: bold;
+    color: #f6e27a;
+}
+
+.current-round-header {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+/* ------------------------------------------------------------- */
+/* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
+/* ------------------------------------------------------------- */
+@media (max-width: 600px) {
+    .player-card {
+        flex: 0 0 24%;
+        min-width: 80px;
+        max-width: 90px;
+        padding: 0.5rem;
     }
-    .player-input-group {
-        flex-basis: auto; /* Let it take default width in a column layout */
-        width: 100%;     /* Ensure it takes full width if not already */
+
+    .player-card h3 {
+        font-size: 0.9rem;
+    }
+    .player-card input.player-name {
+        font-size: 0.9rem;
+    }
+
+    /* Ajustes para la tabla en móviles: más estrecha y tipografía aún más grande */
+    .round-block {
+        max-width: 100%; /* Ocupa todo el ancho disponible del contenedor padre */
+    }
+
+    .round-table {
+        min-width: 400px; /* Reducimos el ancho mínimo para móviles, pero aún permite scroll */
+    }
+
+    .round-table th,
+    .round-table td {
+        font-size: 1.2rem; /* Tipografía grande para móviles */
+        padding: 0.35rem 0.05rem; /* Más padding vertical, muy poco horizontal */
+        /* Las anchuras porcentuales se mantienen, asegurando igualdad */
+    }
+
+    /* Para el botón de "Guardar Ronda" en móviles */
+    #next-round {
+        width: 90%;
+        max-width: 300px;
+        font-size: 1.1rem;
     }
 }
