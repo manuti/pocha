@@ -1,5 +1,6 @@
 {
-  "id": "ContadorPocha",  "name": "Contador Pocha",
+  "id": "ContadorPocha",  
+  "name": "Contador Pocha",
   "short_name": "Contador Pocha",
   "start_url": "index.html",
   "display": "standalone",
