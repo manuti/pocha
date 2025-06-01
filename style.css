@@ -21,13 +21,9 @@ h1, h2 {
 }
 
 .player-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    display: flex;
+    flex-wrap: wrap;	
     margin-bottom: 2rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .player-card {
@@ -36,7 +32,8 @@ h1, h2 {
     border-radius: 8px;
     padding: 0.8rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    width: 100%;
+    width: calc(50% - 10px);
+    margin: 5px;
 }
 
 .player-card h3 {
@@ -205,10 +202,6 @@ h1, h2 {
 /* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
 /* ------------------------------------------------------------- */
 @media (max-width: 600px) {
-    .player-inputs {
-        gap: 0.8rem;
-        max-width: 450px;
-    }
 
     .player-card {
         padding: 0.7rem;
