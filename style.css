@@ -1,4 +1,4 @@
-body {
+bconody {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
     background-color: #1e4022;
@@ -68,8 +68,6 @@ h1, h2 {
 .control-group label {
     font-weight: bold;
     font-size: 0.9rem;
-    margin-right: 0.5rem;
-    flex-shrink: 0;
 }
 
 .control-group .controls {
