@@ -25,15 +25,7 @@ function updateDisplay() {
 }
 
 function changeValue(index, field, delta) {
-    const newValue = players[index][field] + delta;
-    
-    // Para las apuestas (bid), el máximo es el número de cartas por jugador
-    // Para las victorias (won), el máximo también es el número de cartas por jugador
-    const maxValue = cardsPerPlayer;
-    
-    // Aplicar límites: mínimo 0, máximo según el campo
-    players[index][field] = Math.max(0, Math.min(maxValue, newValue));
-    
+    players[index][field] = Math.max(0, players[index][field] + delta);
     updateDisplay();
 }
 
