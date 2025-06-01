@@ -50,8 +50,8 @@ function saveRound() {
     thead.innerHTML = `
         <tr>
             <th>Jugador</th>
-            <th>Apuestas</th>
-            <th>Ganadas</th>
+            <th>Bets</th>
+            <th>Wins</th>
             <th>Pts</th>
             <th>Total</th>
         </tr>
