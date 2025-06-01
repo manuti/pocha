@@ -21,13 +21,13 @@ h1, h2 {
 }
 
 .player-inputs {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-    justify-content: space-between;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
     margin-bottom: 2rem;
-    padding-bottom: 0.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .player-card {
@@ -36,14 +36,12 @@ h1, h2 {
     border-radius: 8px;
     padding: 0.8rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    flex: 0 0 auto;
-    min-width: 100px;
-    max-width: 120px;
+    width: 100%;
 }
 
 .player-card h3 {
     margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
     color: #fff;
     font-size: 1rem;
 }
@@ -64,27 +62,29 @@ h1, h2 {
 
 .control-group {
     margin-bottom: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .control-group label {
-    display: block;
     font-weight: bold;
-    margin-bottom: 0.3rem;
     font-size: 0.9rem;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
 }
 
 .control-group .controls {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.5rem;
     align-items: center;
-    justify-content: center;
 }
 
 .control-group button {
     background-color: #d6ad60;
     border: none;
     padding: 0.4rem 0.6rem;
-    font-size: 1rem; /* Mantenemos este tamaño */
+    font-size: 1rem;
     border-radius: 6px;
     color: #1e4022;
     font-weight: bold;
@@ -99,7 +99,7 @@ h1, h2 {
 .control-group .value {
     min-width: 1.5rem;
     text-align: center;
-    font-size: 1rem; /* Mantenemos este tamaño */
+    font-size: 1rem;
     font-weight: bold;
 }
 
@@ -107,7 +107,7 @@ h1, h2 {
     background-color: #d6ad60;
     border: none;
     padding: 0.8rem 1.5rem;
-    font-size: 1.1rem; /* Mantenemos este tamaño */
+    font-size: 1.1rem;
     border-radius: 8px;
     color: #1e4022;
     font-weight: bold;
@@ -124,7 +124,7 @@ h1, h2 {
 .scoreboard {
     margin-top: 2rem;
     display: flex;
-    justify-content: center; /* Centra los bloques de ronda */
+    justify-content: center;
     align-items: flex-start;
     flex-wrap: wrap;
 }
@@ -136,8 +136,7 @@ h1, h2 {
     overflow: hidden;
     background-color: #3c6b44;
     width: 100%;
-    max-width: 500px; /* Mantener un ancho máximo para la tabla en escritorio */
-    /* Añadimos un contenedor para el scroll si la tabla es más ancha que el round-block */
+    max-width: 500px;
     overflow-x: auto;
 }
 
@@ -151,36 +150,34 @@ h1, h2 {
 }
 
 .round-table {
-    width: 100%; /* La tabla ocupará el 100% del round-block (que puede tener scroll) */
+    width: 100%;
     border-collapse: collapse;
     background-color: #3c6b44;
-    table-layout: fixed; /* ¡Importante! Fija el diseño de la tabla */
-    min-width: 450px; /* Ancho mínimo para la tabla si todas las columnas son iguales */
+    table-layout: fixed;
+    min-width: 450px;
 }
 
 .round-table th,
 .round-table td {
-    padding: 0.4rem 0.1rem; /* Más padding vertical, menos horizontal */
+    padding: 0.4rem 0.1rem;
     text-align: center;
     border-bottom: 1px solid #598c5c;
-    font-size: 1.1rem; /* Tamaño de fuente más grande por defecto */
-    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
-    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
-    overflow: hidden; /* Oculta cualquier contenido que se desborde */
-    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+    font-size: 1.1rem;
+    width: 20%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Ajuste específico para la primera columna (Jugador) si es necesario */
 .round-table th:first-child,
 .round-table td:first-child {
-    width: 25%; /* Dale un poco más de espacio al nombre del jugador si se prefiere */
-}
-/* Reajustamos las otras columnas para que sumen 100% */
-.round-table th:not(:first-child),
-.round-table td:not(:first-child) {
-    width: 18.75%; /* (100% - 25%) / 4 = 75% / 4 = 18.75% */
+    width: 25%;
 }
 
+.round-table th:not(:first-child),
+.round-table td:not(:first-child) {
+    width: 18.75%;
+}
 
 .round-table thead {
     background-color: #4e7c57;
@@ -208,37 +205,58 @@ h1, h2 {
 /* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
 /* ------------------------------------------------------------- */
 @media (max-width: 600px) {
+    .player-inputs {
+        gap: 0.8rem;
+        max-width: 450px;
+    }
+
     .player-card {
-        flex: 0 0 24%;
-        min-width: 80px;
-        max-width: 90px;
-        padding: 0.5rem;
+        padding: 0.7rem;
     }
 
     .player-card h3 {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.6rem;
     }
+    
     .player-card input.player-name {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
     }
 
-    /* Ajustes para la tabla en móviles: más estrecha y tipografía aún más grande */
+    .control-group {
+        margin-bottom: 0.6rem;
+    }
+
+    .control-group .controls {
+        gap: 0.4rem;
+    }
+
+    .control-group button {
+        padding: 0.35rem 0.55rem;
+        min-width: 26px;
+        font-size: 0.95rem;
+    }
+
+    .control-group .value {
+        min-width: 1.3rem;
+        font-size: 0.95rem;
+    }
+
+    /* Ajustes para la tabla en móviles */
     .round-block {
-        max-width: 100%; /* Ocupa todo el ancho disponible del contenedor padre */
+        max-width: 100%;
     }
 
     .round-table {
-        min-width: 400px; /* Reducimos el ancho mínimo para móviles, pero aún permite scroll */
+        min-width: 400px;
     }
 
     .round-table th,
     .round-table td {
-        font-size: 1.2rem; /* Tipografía grande para móviles */
-        padding: 0.35rem 0.05rem; /* Más padding vertical, muy poco horizontal */
-        /* Las anchuras porcentuales se mantienen, asegurando igualdad */
+        font-size: 1.2rem;
+        padding: 0.35rem 0.05rem;
     }
 
-    /* Para el botón de "Guardar Ronda" en móviles */
     #next-round {
         width: 90%;
         max-width: 300px;
