@@ -1,31 +1,22 @@
 {
-  "id": "ContadorPocha",  
+  "id": "com.picajoso.contadorpocha",  
   "name": "Contador Pocha",
-  "short_name": "Contador Pocha",
+  "short_name": "Pocha",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1e4022",
   "theme_color": "#1e4022",
   "description": "Contador para el juego de cartas Pocha.",
-
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/picajoso/pocha/refs/heads/main/icons/icon-192.png",
+      "src": "icons/icon-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://raw.githubusercontent.com/picajoso/pocha/refs/heads/main/icons/icon-512.png",
+      "src": "icons/icon-512x512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
-  ],
-  "prefer_related_applications": true,
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.github.android",
-      "id": "com.github.android"
-    }
-  ],  
+  ]
 }
