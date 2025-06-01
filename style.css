@@ -1,4 +1,4 @@
-kbody {
+body {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
     background-color: #1e4022;
@@ -173,10 +173,14 @@ h1, h2 {
     text-align: center;
     border-bottom: 1px solid #598c5c;
     font-size: 1.1rem; /* Tamaño de fuente por defecto */
-    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.round-table th,
+.round-table td {
+    width: 20%; /* Cada columna ocupa el 20% (100% / 5 columnas) */
 }
 
 .round-table thead {
