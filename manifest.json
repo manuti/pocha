@@ -1,11 +1,12 @@
 {
-  "name": "PochaCounter",
+  "id": "com.picajoso.pocha",
+  "name": "Contador Pocha",
   "short_name": "Pocha",
-  "start_url": ".",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "Contador de puntos del juego de la pocha.",
+  "background_color": "#1e4022",
+  "theme_color": "#1e4022",
+  "description": "Contador para el juego de cartas Pocha.",
   "icons": [
     {
       "src": "icons/icon-192.png",
