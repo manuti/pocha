@@ -151,7 +151,6 @@ h1, h2 {
     border-collapse: collapse;
     background-color: #3c6b44;
     table-layout: fixed;
-    min-width: 450px;
 }
 
 .round-table th,
@@ -238,10 +237,6 @@ h1, h2 {
     /* Ajustes para la tabla en móviles */
     .round-block {
         max-width: 100%;
-    }
-
-    .round-table {
-        min-width: 400px;
     }
 
     .round-table th,
