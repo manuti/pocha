@@ -68,7 +68,6 @@ h1, h2 {
 .control-group label {
     font-weight: bold;
     font-size: 0.9rem;
-    margin-right: 0.5rem;
     flex-shrink: 0;
 }
 
