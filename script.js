@@ -1,160 +1,271 @@
-const numPlayers = 4;
-let round = 1;
-let cardsPerPlayer = 1;
-const maxCards = 10;
-let increasing = true;
-
-const players = Array.from({ length: numPlayers }, (_, i) => ({
-    name: '',
-    bid: 0,
-    won: 0,
-    total: 0
-}));
-
-function updateCurrentRoundHeader() {
-    document.getElementById("current-round-header").textContent = `Ronda: ${round}, Cartas: ${cardsPerPlayer}`;
+body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+    background-color: #1e4022;
+    color: #fff;
+    padding: 1rem;
 }
 
-function updateDisplay() {
-    players.forEach((player, index) => {
-        const card = document.querySelector(`.player-card[data-player='${index}']`);
-        card.querySelector(".player-name").value = player.name;
-        card.querySelector(".bid-value").textContent = player.bid;
-        card.querySelector(".won-value").textContent = player.won;
-    });
+.container {
+    max-width: 700px;
+    margin: auto;
+    background-color: #2f5335;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
-function changeValue(index, field, delta) {
-    const newValue = players[index][field] + delta;
-    
-    // Para las apuestas (bid), el máximo es el número de cartas por jugador
-    // Para las victorias (won), el máximo también es el número de cartas por jugador
-    const maxValue = cardsPerPlayer;
-    
-    // Aplicar límites: mínimo 0, máximo según el campo
-    players[index][field] = Math.max(0, Math.min(maxValue, newValue));
-    
-    updateDisplay();
+h1, h2 {
+    text-align: center;
+    color: #eac77a;
 }
 
-function saveRound() {
-    const scoreboard = document.getElementById("scoreboard");
-    
-    // Crear el bloque de la ronda actual
-    const roundBlock = document.createElement("div");
-    roundBlock.className = "round-block";
-    
-    // Crear el header de la ronda
-    const roundHeader = document.createElement("div");
-    roundHeader.className = "round-label";
-    roundHeader.textContent = `Ronda: ${round}, Cartas: ${cardsPerPlayer}`;
-    
-    // Crear la tabla
-    const table = document.createElement("table");
-    table.className = "round-table";
-    
-    // Crear el header de la tabla
-    const thead = document.createElement("thead");
-    thead.innerHTML = `
-        <tr>
-            <th>Jugador</th>
-            <th>Bets</th>
-            <th>Wins</th>
-            <th>Pts</th>
-            <th>Total</th>
-        </tr>
-    `;
-    
-    // Crear el cuerpo de la tabla
-    const tbody = document.createElement("tbody");
-    
-    players.forEach((player, index) => {
-        const points =
-            player.bid === player.won
-                ? 5 + player.won * 3
-                : -3 * Math.abs(player.bid - player.won);
-        player.total += points;
+.player-inputs {
+    display: flex;
+    flex-wrap: wrap;	
+    margin-bottom: 2rem;
+}
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${player.name}</td>
-            <td>${player.bid}</td>
-            <td>${player.won}</td>
-            <td>${points}</td>
-            <td class="total">${player.total}</td>
-        `;
-        tbody.appendChild(row);
+.player-card {
+    background-color: #3c6b44;
+    border: 2px solid #598c5c;
+    border-radius: 8px;
+    padding: 0.8rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    width: calc(50% - 10px);
+    margin: 5px;
+    box-sizing: border-box;
+}
 
-        // Reset para la siguiente ronda
-        player.bid = 0;
-        player.won = 0;
-    });
-    
-    // Ensamblar la tabla
-    table.appendChild(thead);
-    table.appendChild(tbody);
-    
-    // Ensamblar el bloque
-    roundBlock.appendChild(roundHeader);
-    roundBlock.appendChild(table);
-    
-    // Insertar al principio del scoreboard (nuevas rondas arriba)
-    scoreboard.insertBefore(roundBlock, scoreboard.firstChild);
+.player-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    color: #fff;
+    font-size: 1rem;
+}
 
-    // Calcular siguiente número de cartas
-    if (increasing) {
-        if (cardsPerPlayer < maxCards) {
-            cardsPerPlayer++;
-        } else {
-            increasing = false;
-            cardsPerPlayer--;
-        }
-    } else {
-        if (cardsPerPlayer > 1) {
-            cardsPerPlayer--;
-        }
+.player-card input.player-name {
+    width: calc(100% - 1rem);
+    background-color: #2f5335;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    margin: 0 auto;
+    display: block;
+}
+
+.control-group {
+    margin-bottom: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.control-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.control-group .controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.control-group button {
+    background-color: #d6ad60;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    color: #1e4022;
+    font-weight: bold;
+    cursor: pointer;
+    min-width: 28px;
+}
+
+.control-group button:hover {
+    background-color: #eac77a;
+}
+
+.control-group .value {
+    min-width: 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#next-round {
+    background-color: #d6ad60;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    color: #1e4022;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 2rem auto;
+}
+
+#next-round:hover {
+    background-color: #eac77a;
+}
+
+.scoreboard {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.round-block {
+    margin-bottom: 2rem;
+    border: 2px solid #598c5c;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #3c6b44;
+    width: 100%;
+    max-width: 500px;
+    overflow-x: auto;
+}
+
+.round-label {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin: 0;
+    padding: 0.8rem;
+    background-color: #4e7c57;
+}
+
+.round-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #3c6b44;
+    table-layout: fixed;
+}
+
+.round-table th,
+.round-table td {
+    padding: 0.4rem 0.1rem;
+    text-align: center;
+    border-bottom: 1px solid #598c5c;
+    font-size: 1.1rem;
+    width: 20%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.round-table th:first-child,
+.round-table td:first-child {
+    width: 25%;
+}
+
+.round-table th:not(:first-child),
+.round-table td:not(:first-child) {
+    width: 18.75%;
+}
+
+.round-table thead {
+    background-color: #4e7c57;
+}
+
+.round-table th {
+    font-weight: bold;
+    color: #fff;
+}
+
+.round-table td.total {
+    font-weight: bold;
+    color: #f6e27a;
+}
+
+.current-round-header {
+    font-weight: bold;
+    color: #f6e27a;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+/* ------------------------------------------------------------- */
+/* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
+/* ------------------------------------------------------------- */
+@media (max-width: 600px) {
+
+    .player-card {
+        padding: 0.7rem;
     }
-    round++;
-    updateDisplay();
-    updateCurrentRoundHeader();
+
+    .player-card h3 {
+        font-size: 0.95rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .player-card input.player-name {
+        font-size: 0.95rem;
+    }
+
+    .control-group {
+        margin-bottom: 0.6rem;
+    }
+
+    .control-group .controls {
+        gap: 0.4rem;
+    }
+
+    .control-group button {
+        padding: 0.35rem 0.55rem;
+        min-width: 26px;
+        font-size: 0.95rem;
+    }
+
+    .control-group .value {
+        min-width: 1.3rem;
+        font-size: 0.95rem;
+    }
+
+    /* Ajustes para la tabla en móviles */
+    .round-block {
+        max-width: 100%;
+    }
+
+    .round-table th,
+    .round-table td {
+        font-size: 1.2rem;
+        padding: 0.35rem 0.05rem;
+    }
+
+    #next-round {
+        width: 90%;
+        max-width: 300px;
+        font-size: 1.1rem;
+    }
+}
+/* Indicador de suma de apuestas */
+.bids-box {
+    background-color: #4e7c57;        /* verde por defecto (en línea con la paleta) */
+    border: 2px solid #598c5c;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    margin: -0.3rem auto 1rem;
+    text-align: center;
+    width: fit-content;
+    font-weight: bold;
 }
 
-function askPlayerNames() {
-    players.forEach((player, i) => {
-        const name = prompt(`Nombre del jugador ${i + 1}:`, `Jugador ${i + 1}`);
-        player.name = name || `Jugador ${i + 1}`;
-    });
-    updateDisplay();
+/* Alerta cuando la suma de apuestas == número de cartas */
+.bids-box.alert {
+    background-color: #b93b3b;        /* rojo */
+    border-color: #d67a7a;
 }
-
-function setup() {
-    askPlayerNames();
-    updateCurrentRoundHeader();
-
-    document.querySelectorAll(".bid-plus").forEach((btn, i) =>
-        btn.addEventListener("click", () => changeValue(getIndex(btn), "bid", 1))
-    );
-    document.querySelectorAll(".bid-minus").forEach((btn, i) =>
-        btn.addEventListener("click", () => changeValue(getIndex(btn), "bid", -1))
-    );
-    document.querySelectorAll(".won-plus").forEach((btn, i) =>
-        btn.addEventListener("click", () => changeValue(getIndex(btn), "won", 1))
-    );
-    document.querySelectorAll(".won-minus").forEach((btn, i) =>
-        btn.addEventListener("click", () => changeValue(getIndex(btn), "won", -1))
-    );
-
-    document.getElementById("next-round").addEventListener("click", saveRound);
-
-    document.querySelectorAll(".player-name").forEach((input, index) => {
-        input.addEventListener("input", () => {
-            players[index].name = input.value;
-        });
-    });
-}
-
-function getIndex(element) {
-    return parseInt(element.closest(".player-card").dataset.player);
-}
-
-window.addEventListener("DOMContentLoaded", setup);
