@@ -1,10 +1,11 @@
 # Contador de Pocha — README de cambios
 
 Este documento resume **todos los cambios** introducidos sobre la versión original para que la app funcione con 5 jugadores, nueva puntuación, control de apuestas, y un plan de rondas finito.
+El proyecto original es de https://javipas.com/2025/08/04/chatgpt-puede-ser-maravilloso/ y se ha hecho un fork desde este repositorio de código https://github.com/picajoso/pocha
 
 ---
 
-## Resumen de mejoras
+## Resumen de cambios
 
 * 👥 **5 jugadores** (antes 4).
 * 🧮 **Nueva puntuación**: +10 por acertar la apuesta y +5 por cada baza acertada; penalización −5 por cada diferencia.
@@ -202,8 +203,110 @@ roundBlock.appendChild(table); // (esta línea faltaba)
 
 ---
 
+## v2.1 — Tabla única horizontal de rondas
+
+- Se reemplaza el resumen vertical por **una única tabla** (`<table class="score-table">`) dentro de `#scoreboard`.
+- Cabecera: primera columna doble (“Ronda/Tipo”) y una columna por **jugador** (nombres dinámicos).
+- Se crea siempre una **fila “Total”** al principio, que se actualiza cada ronda.
+- Por cada ronda se agregan **3 filas**: `Bets`, `Wins`, `Pts`. La primera celda de la ronda (con `rowSpan=3`) muestra la **etiqueta de ronda** (ver v2.2).
+- Nuevas utilidades en `script.js`:
+  - `ensureScoreTable()` crea la tabla si no existe.
+  - `renderHeader()` sincroniza los nombres de la cabecera con los inputs.
+  - `updateTotalsRow()` actualiza la fila de totales.
+  - `appendRoundRows(label, cards, betsArr, winsArr, ptsArr)` añade las filas de la ronda.
+- `saveRound()` deja de crear bloques/tablitas por ronda; ahora **solo** añade filas a esta tabla única y actualiza los totales.
+
+**CSS añadido** (al final de `style.css`):
+```css
+.score-table { width: 100%; border-collapse: collapse; background: #3c6b44; table-layout: fixed; }
+.score-table th, .score-table td { border-bottom: 1px solid #598c5c; padding: 0.4rem 0.6rem; text-align: center; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.score-table thead th { background: #4e7c57; font-weight: bold; }
+.score-table .round-label { background: #2f5335; font-weight: bold; color: #f6e27a; }
+.score-table .row-type { background: #4e7c57; font-weight: 600; }
+.score-table .total-row th, .score-table .total-row td { background: #3f6f47; font-weight: 700; color: #f6e27a; }
+````
+
+---
+
+## v2.2 — Etiquetas cortas en la tabla (1, 2, 3… y S1, S2…)
+
+* El plan de rondas ahora define una propiedad `short` con la **etiqueta corta** para mostrar en la tabla:
+
+```js
+function buildRoundPlan() {
+  const plan = [];
+  for (let i = 1; i <= 8; i++) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: i });
+  for (let i = 9; i <= 12; i++) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: 8 });
+  let c = 7;
+  for (let i = 13; i <= 19; i++, c--) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: c });
+  for (let s = 1; s <= 5; s++) plan.push({ title: `Subastado: ${s}`, short: `S${s}`, cards: 8 });
+  return plan;
+}
+```
+
+* La tabla muestra **solo** la etiqueta corta (p. ej. `1`, `2`, `S1`) en la primera celda de cada ronda:
+
+```js
+function appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr) {
+  // ...
+  if (r === 0) {
+    const tdRound = document.createElement("td");
+    tdRound.className = "round-label";
+    tdRound.rowSpan = 3;
+    tdRound.textContent = roundLabel; // "1", "2", "S1", ...
+    tr.appendChild(tdRound);
+  }
+  // ...
+}
+```
+
+* `saveRound()` pasa `roundPlan[roundIndex].short` a `appendRoundRows(...)`.
+
+---
+
+## v2.3 — Validación de “Ganadas = Cartas de la ronda”
+
+* **Nueva validación obligatoria**: la suma de `Ganadas` (todas las personas) debe ser **igual** al número de cartas de esa ronda.
+* Si no se cumple, el botón **“Guardar ronda”** se desactiva y muestra el mensaje:
+  **`Ajusta Ganadas (X/Y)`**.
+* Implementación:
+
+  * Nueva función `updateSaveButtonState()` llamada desde `updateDisplay()`, `updateCurrentRoundHeader()` y `setup()`:
+
+```js
+function updateSaveButtonState() {
+  const btn = document.getElementById("next-round");
+  if (!btn) return;
+  if (roundIndex >= roundPlan.length) { btn.textContent = "Partida finalizada"; btn.disabled = true; return; }
+
+  const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+  const ok = totalWins === cardsPerPlayer;
+  btn.disabled = !ok;
+  btn.textContent = ok ? "Guardar ronda" : `Ajusta Ganadas (${totalWins}/${cardsPerPlayer})`;
+}
+```
+
+* **Doble chequeo** dentro de `saveRound()` por seguridad:
+
+```js
+function saveRound() {
+  const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+  if (totalWins !== cardsPerPlayer) { updateSaveButtonState(); return; }
+  // ... resto del guardado
+}
+```
+
+**Notas**:
+
+* El encabezado superior sigue mostrando `Ronda: X, Cartas: Y` para cada paso del plan.
+* La validación solo afecta al botón de **guardar**; los controles +/− siguen funcionando para ajustar hasta cuadrar.
+
+
 ## Historial de versiones
 
+* **v2.3**: Validación de “Ganadas = Cartas de la ronda”
+* **v2.2**: Etiquetas cortas en la tabla (1, 2, 3… y S1, S2…)
+* **v2.1**: Tabla única horizontal de rondas
 * **v2.0**: 5ª tarjeta de jugador; nueva puntuación; indicador de apuestas; plan de rondas finito + cierre; fix de resumen.
 * **v1.0 (original)**: 4 jugadores, puntuación 5 + 3*won / −3*|diff|, lógica de cartas infinita “sube/baja”, sin indicador de apuestas.
 
