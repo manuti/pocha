@@ -269,3 +269,41 @@ h1, h2 {
     background-color: #b93b3b;        /* rojo */
     border-color: #d67a7a;
 }
+
+/* ---- Tabla única de rondas ---- */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #3c6b44;
+  table-layout: fixed;
+}
+.score-table th,
+.score-table td {
+  border-bottom: 1px solid #598c5c;
+  padding: 0.4rem 0.6rem;
+  text-align: center;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+}
+.score-table thead th {
+  background: #4e7c57;
+  font-weight: bold;
+}
+.score-table .round-label {
+  background: #2f5335;
+  font-weight: bold;
+  color: #f6e27a;
+}
+.score-table .row-type {
+  background: #4e7c57;
+  font-weight: 600;
+}
+.score-table .total-row th,
+.score-table .total-row td {
+  background: #3f6f47;
+  font-weight: 700;
+  color: #f6e27a;
+}
