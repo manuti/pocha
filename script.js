@@ -41,6 +41,7 @@ function updateCurrentRoundHeader() {
     header.textContent = `Partida finalizada`;
   }
   updateBidsIndicator();
+  updateSaveButtonState();
 }
 
 function updateDisplay() {
@@ -55,6 +56,7 @@ function updateDisplay() {
     if (wonEl)  wonEl.textContent = player.won;
   });
   updateBidsIndicator();
+  updateSaveButtonState();
 }
 
 function changeValue(index, field, delta) {
@@ -75,6 +77,25 @@ function updateBidsIndicator() {
   const totalBids = players.reduce((sum, p) => sum + (p.bid || 0), 0);
   el.textContent = `Apuestas: ${totalBids} / ${cardsPerPlayer}`;
   el.classList.toggle("alert", totalBids === cardsPerPlayer);
+}
+
+// ======= Validación de 'Ganadas' y estado del botón =======
+function updateSaveButtonState() {
+  const btn = document.getElementById("next-round");
+  if (!btn) return;
+
+  // Si la partida terminó, bloquea definitivamente
+  if (roundIndex >= roundPlan.length) {
+    btn.textContent = "Partida finalizada";
+    btn.disabled = true;
+    return;
+  }
+
+  const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+  const ok = totalWins === cardsPerPlayer;
+
+  btn.disabled = !ok;
+  btn.textContent = ok ? "Guardar ronda" : `Ajusta Ganadas (${totalWins}/${cardsPerPlayer})`;
 }
 
 // ======= Scoreboard: Tabla única horizontal =======
@@ -157,7 +178,7 @@ function appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr) {
       const tdRound = document.createElement("td");
       tdRound.className = "round-label";
       tdRound.rowSpan = 3;
-      tdRound.textContent = roundLabel; // <<--- SOLO "1", "2", "S1", ...
+      tdRound.textContent = roundLabel; // SOLO "1", "2", "S1", ...
       tr.appendChild(tdRound);
     }
 
@@ -178,6 +199,13 @@ function appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr) {
 
 // ======= Flujo de juego =======
 function saveRound() {
+  // Doble validación por seguridad (por si el botón no estuviera disabled)
+  const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+  if (totalWins !== cardsPerPlayer) {
+    updateSaveButtonState();
+    return;
+  }
+
   ensureScoreTable();
 
   // Datos de la ronda actual
@@ -212,6 +240,7 @@ function saveRound() {
   cardsPerPlayer = roundPlan[roundIndex].cards;
   updateDisplay();
   updateCurrentRoundHeader();
+  updateSaveButtonState();
 }
 
 function endGame() {
@@ -279,6 +308,7 @@ function setup() {
   updateTotalsRow();
   updateCurrentRoundHeader();
   updateDisplay();
+  updateSaveButtonState();
 
   // Listeners de + / -
   document.querySelectorAll(".bid-plus").forEach((btn) =>
