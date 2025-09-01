@@ -251,3 +251,21 @@ h1, h2 {
         font-size: 1.1rem;
     }
 }
+/* Indicador de suma de apuestas */
+.bids-box {
+    background-color: #4e7c57;        /* verde por defecto (en línea con la paleta) */
+    border: 2px solid #598c5c;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    margin: -0.3rem auto 1rem;
+    text-align: center;
+    width: fit-content;
+    font-weight: bold;
+}
+
+/* Alerta cuando la suma de apuestas == número de cartas */
+.bids-box.alert {
+    background-color: #b93b3b;        /* rojo */
+    border-color: #d67a7a;
+}
