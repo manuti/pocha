@@ -2,20 +2,20 @@
 // ======= Configuración inicial =======
 const numPlayers = 5;
 
-// Plan fijo de rondas (incluye Subastados) -------------------
+// Plan fijo de rondas (incluye Subastados) con etiqueta corta ---------
 let roundIndex = 0; // índice actual (0..plan.length-1)
 
 function buildRoundPlan() {
   const plan = [];
   // Rondas 1..8 (sube 1..8)
-  for (let i = 1; i <= 8; i++) plan.push({ title: `Ronda: ${i}`, cards: i });
+  for (let i = 1; i <= 8; i++) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: i });
   // Rondas 9..12 (8 cartas)
-  for (let i = 9; i <= 12; i++) plan.push({ title: `Ronda: ${i}`, cards: 8 });
+  for (let i = 9; i <= 12; i++) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: 8 });
   // Rondas 13..19 (baja 7..1)
   let c = 7;
-  for (let i = 13; i <= 19; i++, c--) plan.push({ title: `Ronda: ${i}`, cards: c });
+  for (let i = 13; i <= 19; i++, c--) plan.push({ title: `Ronda: ${i}`, short: `${i}`, cards: c });
   // Subastados 1..5 (8 cartas)
-  for (let s = 1; s <= 5; s++) plan.push({ title: `Subastado: ${s}`, cards: 8 });
+  for (let s = 1; s <= 5; s++) plan.push({ title: `Subastado: ${s}`, short: `S${s}`, cards: 8 });
   return plan;
 }
 
@@ -146,7 +146,7 @@ function updateTotalsRow() {
   }
 }
 
-function appendRoundRows(roundTitle, cards, betsArr, winsArr, ptsArr) {
+function appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr) {
   const types = ["Bets", "Wins", "Pts"];
   const data = [betsArr, winsArr, ptsArr];
 
@@ -157,7 +157,7 @@ function appendRoundRows(roundTitle, cards, betsArr, winsArr, ptsArr) {
       const tdRound = document.createElement("td");
       tdRound.className = "round-label";
       tdRound.rowSpan = 3;
-      tdRound.textContent = `${roundTitle}, Cartas: ${cards}`;
+      tdRound.textContent = roundLabel; // <<--- SOLO "1", "2", "S1", ...
       tr.appendChild(tdRound);
     }
 
@@ -181,7 +181,7 @@ function saveRound() {
   ensureScoreTable();
 
   // Datos de la ronda actual
-  const roundTitle = roundPlan[roundIndex].title;
+  const roundLabel = roundPlan[roundIndex].short || roundPlan[roundIndex].title;
   const cards = cardsPerPlayer;
 
   // Datos por jugador en esta ronda
@@ -199,7 +199,7 @@ function saveRound() {
   });
 
   // Añadir 3 filas de la ronda a la tabla
-  appendRoundRows(roundTitle, cards, betsArr, winsArr, ptsArr);
+  appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr);
   updateTotalsRow();
 
   // Avanzar en el plan de rondas
