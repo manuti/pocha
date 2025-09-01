@@ -1,271 +1,201 @@
-body {
-    margin: 0;
-    font-family: 'Quicksand', sans-serif;
-    background-color: #1e4022;
-    color: #fff;
-    padding: 1rem;
+const numPlayers = 5;
+
+let roundIndex = 0; // índice 0..(plan.length-1)
+
+// Plan fijo de la partida
+function buildRoundPlan() {
+    const plan = [];
+    // Ronda 1..8 (sube 1..8)
+    for (let i = 1; i <= 8; i++) plan.push({ title: `Ronda: ${i}`, cards: i });
+    // Ronda 9..12 (8 cartas)
+    for (let i = 9; i <= 12; i++) plan.push({ title: `Ronda: ${i}`, cards: 8 });
+    // Ronda 13..19 (baja 7..1)
+    let c = 7;
+    for (let i = 13; i <= 19; i++, c--) plan.push({ title: `Ronda: ${i}`, cards: c });
+    // Subastados 1..5 (8 cartas)
+    for (let s = 1; s <= 5; s++) plan.push({ title: `Subastado: ${s}`, cards: 8 });
+    return plan;
 }
 
-.container {
-    max-width: 700px;
-    margin: auto;
-    background-color: #2f5335;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-}
+const roundPlan = buildRoundPlan();
+let cardsPerPlayer = roundPlan[roundIndex].cards;
 
-h1, h2 {
-    text-align: center;
-    color: #eac77a;
-}
 
-.player-inputs {
-    display: flex;
-    flex-wrap: wrap;	
-    margin-bottom: 2rem;
-}
+const players = Array.from({ length: numPlayers }, (_, i) => ({
+    name: '',
+    bid: 0,
+    won: 0,
+    total: 0
+}));
 
-.player-card {
-    background-color: #3c6b44;
-    border: 2px solid #598c5c;
-    border-radius: 8px;
-    padding: 0.8rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    width: calc(50% - 10px);
-    margin: 5px;
-    box-sizing: border-box;
-}
-
-.player-card h3 {
-    margin-top: 0;
-    margin-bottom: 0.8rem;
-    color: #fff;
-    font-size: 1rem;
-}
-
-.player-card input.player-name {
-    width: calc(100% - 1rem);
-    background-color: #2f5335;
-    color: #fff;
-    border: none;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 4px;
-    padding: 0.2rem 0.5rem;
-    margin: 0 auto;
-    display: block;
-}
-
-.control-group {
-    margin-bottom: 0.8rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.control-group label {
-    font-weight: bold;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-}
-
-.control-group .controls {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.control-group button {
-    background-color: #d6ad60;
-    border: none;
-    padding: 0.4rem 0.6rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    color: #1e4022;
-    font-weight: bold;
-    cursor: pointer;
-    min-width: 28px;
-}
-
-.control-group button:hover {
-    background-color: #eac77a;
-}
-
-.control-group .value {
-    min-width: 1.5rem;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-#next-round {
-    background-color: #d6ad60;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    color: #1e4022;
-    font-weight: bold;
-    cursor: pointer;
-    display: block;
-    width: fit-content;
-    margin: 0 auto 2rem auto;
-}
-
-#next-round:hover {
-    background-color: #eac77a;
-}
-
-.scoreboard {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-}
-
-.round-block {
-    margin-bottom: 2rem;
-    border: 2px solid #598c5c;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #3c6b44;
-    width: 100%;
-    max-width: 500px;
-    overflow-x: auto;
-}
-
-.round-label {
-    font-weight: bold;
-    color: #f6e27a;
-    text-align: center;
-    margin: 0;
-    padding: 0.8rem;
-    background-color: #4e7c57;
-}
-
-.round-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #3c6b44;
-    table-layout: fixed;
-}
-
-.round-table th,
-.round-table td {
-    padding: 0.4rem 0.1rem;
-    text-align: center;
-    border-bottom: 1px solid #598c5c;
-    font-size: 1.1rem;
-    width: 20%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.round-table th:first-child,
-.round-table td:first-child {
-    width: 25%;
-}
-
-.round-table th:not(:first-child),
-.round-table td:not(:first-child) {
-    width: 18.75%;
-}
-
-.round-table thead {
-    background-color: #4e7c57;
-}
-
-.round-table th {
-    font-weight: bold;
-    color: #fff;
-}
-
-.round-table td.total {
-    font-weight: bold;
-    color: #f6e27a;
-}
-
-.current-round-header {
-    font-weight: bold;
-    color: #f6e27a;
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-/* ------------------------------------------------------------- */
-/* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
-/* ------------------------------------------------------------- */
-@media (max-width: 600px) {
-
-    .player-card {
-        padding: 0.7rem;
+function updateCurrentRoundHeader() {
+    const header = document.getElementById("current-round-header");
+    if (roundIndex < roundPlan.length) {
+        header.textContent = `${roundPlan[roundIndex].title}, Cartas: ${cardsPerPlayer}`;
+    } else {
+        header.textContent = `Partida finalizada`;
     }
+    updateBidsIndicator?.(); // si ya añadiste el indicador de apuestas
+}
 
-    .player-card h3 {
-        font-size: 0.95rem;
-        margin-bottom: 0.6rem;
-    }
+function updateBidsIndicator() {
+    const totalBids = players.reduce((sum, p) => sum + p.bid, 0);
+    const el = document.getElementById("bids-indicator");
+    if (!el) return;
+
+    // Mostrar "Apuestas: X / Y" donde Y es el número de cartas de la ronda
+    el.textContent = `Apuestas: ${totalBids} / ${cardsPerPlayer}`;
+
+    // Poner en rojo cuando X == Y
+    el.classList.toggle("alert", totalBids === cardsPerPlayer);
+}
+
+function updateDisplay() {
+    players.forEach((player, index) => {
+        const card = document.querySelector(`.player-card[data-player='${index}']`);
+        card.querySelector(".player-name").value = player.name;
+        card.querySelector(".bid-value").textContent = player.bid;
+        card.querySelector(".won-value").textContent = player.won;
+    });
+    updateBidsIndicator(); // <-- NUEVO
+}
+
+function changeValue(index, field, delta) {
+    const newValue = players[index][field] + delta;
     
-    .player-card input.player-name {
-        font-size: 0.95rem;
-    }
-
-    .control-group {
-        margin-bottom: 0.6rem;
-    }
-
-    .control-group .controls {
-        gap: 0.4rem;
-    }
-
-    .control-group button {
-        padding: 0.35rem 0.55rem;
-        min-width: 26px;
-        font-size: 0.95rem;
-    }
-
-    .control-group .value {
-        min-width: 1.3rem;
-        font-size: 0.95rem;
-    }
-
-    /* Ajustes para la tabla en móviles */
-    .round-block {
-        max-width: 100%;
-    }
-
-    .round-table th,
-    .round-table td {
-        font-size: 1.2rem;
-        padding: 0.35rem 0.05rem;
-    }
-
-    #next-round {
-        width: 90%;
-        max-width: 300px;
-        font-size: 1.1rem;
-    }
-}
-/* Indicador de suma de apuestas */
-.bids-box {
-    background-color: #4e7c57;        /* verde por defecto (en línea con la paleta) */
-    border: 2px solid #598c5c;
-    color: #fff;
-    border-radius: 8px;
-    padding: 0.4rem 0.75rem;
-    margin: -0.3rem auto 1rem;
-    text-align: center;
-    width: fit-content;
-    font-weight: bold;
+    // Para las apuestas (bid), el máximo es el número de cartas por jugador
+    // Para las victorias (won), el máximo también es el número de cartas por jugador
+    const maxValue = cardsPerPlayer;
+    
+    // Aplicar límites: mínimo 0, máximo según el campo
+    players[index][field] = Math.max(0, Math.min(maxValue, newValue));
+    
+    updateDisplay();
 }
 
-/* Alerta cuando la suma de apuestas == número de cartas */
-.bids-box.alert {
-    background-color: #b93b3b;        /* rojo */
-    border-color: #d67a7a;
+function saveRound() {
+    const scoreboard = document.getElementById("scoreboard");
+
+    // Header/tabla de la ronda actual
+    const roundBlock = document.createElement("div");
+    roundBlock.className = "round-block";
+
+    const roundHeader = document.createElement("div");
+    roundHeader.className = "round-label";
+    roundHeader.textContent = `${roundPlan[roundIndex].title}, Cartas: ${cardsPerPlayer}`;
+
+    const table = document.createElement("table");
+    table.className = "round-table";
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = `
+        <tr>
+            <th>Jugador</th>
+            <th>Bets</th>
+            <th>Wins</th>
+            <th>Pts</th>
+            <th>Total</th>
+        </tr>
+    `;
+
+    const tbody = document.createElement("tbody");
+
+    players.forEach((player) => {
+        const points =
+            player.bid === player.won
+                ? 10 + player.won * 5
+                : -5 * Math.abs(player.bid - player.won);
+        player.total += points;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${player.name}</td>
+            <td>${player.bid}</td>
+            <td>${player.won}</td>
+            <td>${points}</td>
+            <td class="total">${player.total}</td>
+        `;
+        tbody.appendChild(row);
+
+        // Reset para la siguiente ronda
+        player.bid = 0;
+        player.won = 0;
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    roundBlock.appendChild(roundHeader);
+    roundBlock.appendChild(table);
+    scoreboard.insertBefore(roundBlock, scoreboard.firstChild);
+
+    // Avanzar en el plan
+    roundIndex++;
+
+    // ¿Se acabó el plan?
+    if (roundIndex >= roundPlan.length) {
+        endGame();
+        return;
+    }
+
+    // Preparar siguiente ronda según plan
+    cardsPerPlayer = roundPlan[roundIndex].cards;
+    updateDisplay();
+    updateCurrentRoundHeader();
 }
+
+function askPlayerNames() {
+    players.forEach((player, i) => {
+        const name = prompt(`Nombre del jugador ${i + 1}:`, `Jugador ${i + 1}`);
+        player.name = name || `Jugador ${i + 1}`;
+    });
+    updateDisplay();
+}
+
+function endGame() {
+    // Encabezado
+    updateCurrentRoundHeader();
+
+    // Botón
+    const btn = document.getElementById("next-round");
+    btn.textContent = "Partida finalizada";
+    btn.disabled = true;
+
+    // Desactivar entradas y botones de suma/resta
+    document.querySelectorAll(".player-name, .bid-plus, .bid-minus, .won-plus, .won-minus")
+        .forEach(el => el.disabled = true);
+
+    // Refrescar indicador de apuestas, si existe
+    updateBidsIndicator?.();
+}
+
+function setup() {
+    askPlayerNames();
+    updateCurrentRoundHeader();
+
+    document.querySelectorAll(".bid-plus").forEach((btn, i) =>
+        btn.addEventListener("click", () => changeValue(getIndex(btn), "bid", 1))
+    );
+    document.querySelectorAll(".bid-minus").forEach((btn, i) =>
+        btn.addEventListener("click", () => changeValue(getIndex(btn), "bid", -1))
+    );
+    document.querySelectorAll(".won-plus").forEach((btn, i) =>
+        btn.addEventListener("click", () => changeValue(getIndex(btn), "won", 1))
+    );
+    document.querySelectorAll(".won-minus").forEach((btn, i) =>
+        btn.addEventListener("click", () => changeValue(getIndex(btn), "won", -1))
+    );
+
+    document.getElementById("next-round").addEventListener("click", saveRound);
+
+    document.querySelectorAll(".player-name").forEach((input, index) => {
+        input.addEventListener("input", () => {
+            players[index].name = input.value;
+        });
+    });
+}
+
+function getIndex(element) {
+    return parseInt(element.closest(".player-card").dataset.player);
+}
+
+window.addEventListener("DOMContentLoaded", setup);
