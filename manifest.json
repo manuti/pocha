@@ -1,6 +1,6 @@
 {
-  "id": "com.picajoso.contadorpocha",  
-  "name": "Contador Pocha",
+  "id": "almu-pocha.netlify.app",
+  "name": "Almu Pocha",
   "short_name": "Pocha",
   "start_url": "index.html",
   "display": "standalone",
@@ -18,5 +18,9 @@
       "type": "image/png",
       "sizes": "512x512"
     }
+  ],
+  "lang": "es",
+  "categories": [
+    "games"
   ]
 }
