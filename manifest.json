@@ -2,7 +2,7 @@
   "id": "almu-pocha.netlify.app",
   "name": "Almu Pocha",
   "short_name": "Pocha",
-  "start_url": "index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#1e4022",
   "theme_color": "#1e4022",

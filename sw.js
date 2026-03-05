@@ -1,13 +1,13 @@
-const CACHE_NAME = "pocha-cache-v4";
+const CACHE_NAME = "pocha-cache-v5";
 const ASSETS = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./script.js",
-  "./chart.js",
-  "./manifest.json",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "/",
+  "/index.html",
+  "/style.css",
+  "/script.js",
+  "/chart.js",
+  "/manifest.json",
+  "/icons/icon-192x192.png",
+  "/icons/icon-512x512.png"
 ];
 
 self.addEventListener("install", function (e) {
@@ -34,7 +34,11 @@ self.addEventListener("activate", function (e) {
 self.addEventListener("fetch", function (e) {
   e.respondWith(
     caches.match(e.request).then(function (cached) {
-      return cached || fetch(e.request);
+      return cached || fetch(e.request).catch(function () {
+        if (e.request.mode === "navigate") {
+          return caches.match("/index.html");
+        }
+      });
     })
   );
 });
