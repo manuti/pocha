@@ -212,6 +212,78 @@ h1, h2 {
 /* ------------------------------------------------------------- */
 @media (max-width: 600px) {
 
+    body {
+        padding: 0.4rem;
+    }
+
+    .container {
+        padding: 0.6rem;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        margin: 0.5rem 0 0.4rem;
+    }
+
+    .current-round-header {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .bids-box {
+        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .player-inputs {
+        gap: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .player-card {
+        padding: 0.45rem 0.5rem;
+    }
+
+    .player-card h3 {
+        margin-bottom: 0.35rem;
+    }
+
+    .player-card input.player-name {
+        font-size: 0.85rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    /* Etiqueta encima, controles centrados debajo */
+    .control-group {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 0.3rem;
+        gap: 2px;
+    }
+
+    .control-group label {
+        font-size: 0.72rem;
+        min-width: unset;
+    }
+
+    .control-group .controls {
+        width: 100%;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+
+    .control-group button {
+        width: 28px;
+        height: 28px;
+        font-size: 0.9rem;
+    }
+
+    .control-group .value {
+        font-size: 0.9rem;
+        min-width: 1.4rem;
+    }
+
     /* Ajustes para la tabla en móviles */
     .round-block {
         max-width: 100%;
@@ -219,14 +291,15 @@ h1, h2 {
 
     .round-table th,
     .round-table td {
-        font-size: 1.2rem;
+        font-size: 1rem;
         padding: 0.35rem 0.05rem;
     }
 
     #next-round {
         width: 90%;
         max-width: 300px;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        padding: 0.7rem 1rem;
     }
 }
 /* Indicador de suma de apuestas */
