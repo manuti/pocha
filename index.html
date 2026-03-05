@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contador de pocha</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json"> 
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
     <div class="container">
@@ -192,7 +192,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('sw.js');
+          navigator.serviceWorker.register('/sw.js');
         });
       }
     </script>
