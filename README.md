@@ -302,8 +302,41 @@ function saveRound() {
 * La validación solo afecta al botón de **guardar**; los controles +/− siguen funcionando para ajustar hasta cuadrar.
 
 
+## v2.4 — Corrección de alineación de botones en móvil (PWA)
+
+En dispositivos móviles (~390 px de ancho) las tarjetas de jugador ocupan el 50 % del ancho de pantalla.
+El espacio interior resultaba demasiado ajustado y los botones `+` / `−` quedaban desalineados entre las filas “Apuesta” y “Ganadas”.
+
+### Causa raíz
+
+* Las etiquetas `Apuesta:` y `Ganadas:` tienen distinto ancho natural; con `justify-content: space-between` esto desplazaba horizontalmente los controles de cada fila.
+* Los botones usaban `padding` variable en lugar de un tamaño fijo, lo que provocaba alturas inconsistentes.
+
+### Cambios en `style.css`
+
+**Estilos base (todas las pantallas)**
+
+| Selector | Antes | Después |
+|---|---|---|
+| `.control-group label` | sin `min-width` | `min-width: 5rem` — iguala el ancho de ambas etiquetas |
+| `.control-group button` | `padding: 0.4rem 0.6rem; min-width: 28px` | `width: 32px; height: 32px; padding: 0; display: flex; align-items/justify-content: center` — botón cuadrado con centrado flex |
+| `.control-group .value` | `min-width: 1.5rem` | `min-width: 1.8rem` |
+
+**Media query móvil (`max-width: 600px`)**
+
+| Selector | Antes | Después |
+|---|---|---|
+| `.player-card` | `padding: 0.7rem` | `padding: 0.6rem` |
+| `.control-group label` | sin override | `font-size: 0.85rem; min-width: 4.5rem` |
+| `.control-group .controls` | `gap: 0.4rem` | `gap: 0.3rem` |
+| `.control-group button` | `padding: 0.35rem 0.55rem; min-width: 26px` | `width: 28px; height: 28px` |
+| `.control-group .value` | `min-width: 1.3rem` | `min-width: 1.4rem` |
+
+---
+
 ## Historial de versiones
 
+* **v2.4**: Corrección de alineación de botones +/− en móvil / PWA
 * **v2.3**: Validación de “Ganadas = Cartas de la ronda”
 * **v2.2**: Etiquetas cortas en la tabla (1, 2, 3… y S1, S2…)
 * **v2.1**: Tabla única horizontal de rondas
