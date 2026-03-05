@@ -1,4 +1,4 @@
-const CACHE_NAME = "pocha-cache-v2";
+const CACHE_NAME = "pocha-cache-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,8 +6,7 @@ const ASSETS = [
   "./script.js",
   "./manifest.json",
   "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap"
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", function (e) {
@@ -34,17 +33,7 @@ self.addEventListener("activate", function (e) {
 self.addEventListener("fetch", function (e) {
   e.respondWith(
     caches.match(e.request).then(function (cached) {
-      return cached || fetch(e.request).then(function (response) {
-        // Cache Google Fonts responses dynamically
-        if (e.request.url.includes("fonts.googleapis.com") ||
-            e.request.url.includes("fonts.gstatic.com")) {
-          var responseClone = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
-            cache.put(e.request, responseClone);
-          });
-        }
-        return response;
-      });
+      return cached || fetch(e.request);
     })
   );
 });
