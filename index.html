@@ -115,16 +115,79 @@
 
         </div>
 
-        <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="text-align: center; margin-bottom: 1rem;">
             <button id="next-round">Guardar ronda</button>
+        </div>
+
+        <div class="stats-buttons-row">
             <button id="new-game" class="btn-secondary">Nueva partida</button>
+            <button id="open-chart" class="btn-secondary">Gráfica</button>
+            <button id="open-history" class="btn-secondary">Historial</button>
+            <button id="open-stats" class="btn-secondary">Estadísticas</button>
+        </div>
+
+        <!-- Modal Historial -->
+        <div id="history-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Historial de Partidas</h3>
+                    <span id="close-history" class="close">&times;</span>
+                </div>
+                <div id="history-list" class="history-list"></div>
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(212,175,55,0.3);">
+                    <h4 style="color: #eac77a; margin: 0 0 0.5rem 0;">Estadísticas Globales</h4>
+                    <button id="btn-global-stats" class="btn-secondary" style="width: 100%;">Ver Estadísticas del Historial</button>
+                </div>
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(212,175,55,0.3);">
+                    <h4 style="color: #eac77a; margin: 0 0 0.5rem 0;">Copia de Seguridad</h4>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <button id="btn-export" class="btn-secondary" style="flex: 1;">Exportar</button>
+                        <button id="btn-import" class="btn-secondary" style="flex: 1;">Importar</button>
+                        <button id="btn-import-single" class="btn-secondary" style="flex: 1;">+Partida</button>
+                    </div>
+                    <div id="backup-area" style="display: none;">
+                        <textarea id="backup-text" placeholder="Datos..." spellcheck="false"
+                            style="width: 100%; height: 80px; background: #1e4022; color: #fff; border: 1px solid #598c5c; border-radius: 4px; padding: 5px; box-sizing: border-box; font-size: 1rem;"></textarea>
+                        <button id="btn-paste-clipboard" style="width:100%;margin-top:0.5rem;display:none;background-color:#598c5c;border:none;padding:0.8rem;border-radius:8px;color:#fff;font-weight:bold;">Pegar del Portapapeles</button>
+                        <button id="btn-copy-clipboard" style="width:100%;margin-top:0.5rem;display:none;background-color:#4BC0C0;border:none;padding:0.8rem;border-radius:8px;color:#1e4022;font-weight:bold;">Copiar al Portapapeles</button>
+                        <button id="btn-save-import" style="width:100%;margin-top:0.5rem;display:none;background-color:#d6ad60;border:none;padding:0.8rem;border-radius:8px;color:#1e4022;font-weight:bold;">Restaurar Datos</button>
+                        <button id="btn-save-single" style="width:100%;margin-top:0.5rem;display:none;background-color:#4BC0C0;border:none;padding:0.8rem;border-radius:8px;color:#1e4022;font-weight:bold;">Añadir Partida</button>
+                        <p id="backup-status" style="font-size:0.8rem;margin:0.5rem 0 0 0;color:#ddd;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Gráfica -->
+        <div id="chart-modal" class="modal">
+            <div class="modal-content" style="width:95%;height:90vh;max-width:none;display:flex;flex-direction:column;background:#fff;color:#1e4022;">
+                <div class="modal-header" style="border-bottom-color:rgba(30,64,34,0.3);">
+                    <h3 style="color:#1e4022;">Evolución de Puntos</h3>
+                    <span id="close-chart" class="close" style="color:#1e4022;">&times;</span>
+                </div>
+                <div style="flex:1;min-height:0;position:relative;">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+                <button id="close-chart-btn" class="btn-secondary" style="align-self:center;margin-top:1rem;">Volver a la partida</button>
+            </div>
+        </div>
+
+        <!-- Modal Estadísticas -->
+        <div id="stats-modal" class="modal">
+            <div class="modal-content" style="width:95%;max-width:700px;max-height:85vh;overflow-y:auto;">
+                <div class="modal-header">
+                    <h3 id="stats-title">Estadísticas</h3>
+                    <span id="close-stats" class="close">&times;</span>
+                </div>
+                <div id="stats-content"></div>
+            </div>
         </div>
 
         <h2>Resumen de Rondas</h2>
-        <div class="scoreboard" id="scoreboard">
-            </div>
+        <div class="scoreboard" id="scoreboard"></div>
     </div>
 
+    <script src="chart.js"></script>
     <script src="script.js"></script>
     <script>
       if ('serviceWorker' in navigator) {

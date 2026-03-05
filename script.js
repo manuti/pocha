@@ -33,6 +33,12 @@ const players = Array.from({ length: numPlayers }, (_, i) => ({
 // Historial de rondas ya guardadas (para reconstruir la tabla tras recargar)
 let roundHistory = []; // [{label, cards, betsArr, winsArr, ptsArr}]
 
+// Partida del historial actualmente visualizada (null = partida en curso)
+let activeHistoryGame = null;
+
+// Instancia de Chart.js activa
+let chartInstance = null;
+
 // ======= Persistencia en localStorage =======
 const STORAGE_KEY = "pocha_game_state";
 
@@ -302,6 +308,7 @@ function saveRound() {
 }
 
 function endGame() {
+  saveGameToHistory();
   updateCurrentRoundHeader();
   const btn = document.getElementById("next-round");
   if (btn) {
@@ -314,6 +321,569 @@ function endGame() {
   updateBidsIndicator();
 }
 
+// ======= Historial de partidas =======
+const HISTORY_KEY = "pocha_history";
+
+function buildRoundsWithResults() {
+  let cumulatives = new Array(numPlayers).fill(0);
+  return roundHistory.map((h) => {
+    h.ptsArr.forEach((pts, i) => { cumulatives[i] += pts; });
+    return {
+      label: h.label,
+      cards: h.cards,
+      results: players.map((p, i) => ({
+        playerId: i,
+        name: p.name,
+        bid: h.betsArr[i],
+        won: h.winsArr[i],
+        points: h.ptsArr[i],
+        total: cumulatives[i],
+      })),
+    };
+  });
+}
+
+function saveGameToHistory() {
+  if (roundHistory.length === 0) return;
+  try {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const gameName = `Partida ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${String(now.getFullYear()).slice(-2)} ${pad(now.getHours())}.${pad(now.getMinutes())}`;
+    const gameData = {
+      id: Date.now(),
+      name: gameName,
+      date: now.toLocaleString(),
+      players: players.map((p) => ({ name: p.name, total: p.total })),
+      rounds: buildRoundsWithResults(),
+    };
+    history.push(gameData);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch (e) {}
+}
+
+function openHistoryModal() {
+  const modal = document.getElementById("history-modal");
+  const historyList = document.getElementById("history-list");
+  const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  historyList.innerHTML = "";
+  if (history.length === 0) {
+    historyList.innerHTML = "<p style='text-align:center;padding:1rem;'>No hay partidas guardadas.</p>";
+  } else {
+    history.slice().reverse().forEach((game) => {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      const sortedPlayers = [...game.players].sort((a, b) => b.total - a.total);
+      const playersHtml = sortedPlayers
+        .map((p, idx) => {
+          const text = `${p.name}: ${p.total}`;
+          return idx === 0 ? `<strong>${text}</strong>` : text;
+        })
+        .join(", ");
+      item.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.5rem;width:100%">
+          <div style="flex:1">
+            <div class="game-name">${game.name}</div>
+            <div class="game-players">${playersHtml}</div>
+          </div>
+          <button class="btn-delete-game" data-id="${game.id}" style="background:#c44;border:none;color:white;padding:0.3rem 0.6rem;border-radius:4px;cursor:pointer;font-size:0.8rem;flex-shrink:0;">🗑️</button>
+        </div>`;
+      item.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btn-delete-game")) {
+          viewGameHistory(game);
+          modal.style.display = "none";
+        }
+      });
+      item.querySelector(".btn-delete-game").addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (confirm(`¿Borrar la partida "${game.name}"?`)) {
+          deleteGame(game.id);
+          openHistoryModal();
+        }
+      });
+      historyList.appendChild(item);
+    });
+  }
+  modal.style.display = "block";
+}
+
+function deleteGame(gameId) {
+  try {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.filter((g) => g.id !== gameId)));
+  } catch (e) {}
+}
+
+function viewGameHistory(game) {
+  activeHistoryGame = game;
+  const host = document.getElementById("scoreboard");
+  host.innerHTML = "";
+
+  const banner = document.createElement("p");
+  banner.style.cssText = "text-align:center;color:#f6e27a;font-weight:bold;margin:0 0 1rem 0;";
+  banner.textContent = `Viendo: ${game.name}`;
+  host.appendChild(banner);
+
+  const table = document.createElement("table");
+  table.className = "score-table";
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  const thLabel = document.createElement("th");
+  thLabel.textContent = "Jugador";
+  thLabel.colSpan = 2;
+  headRow.appendChild(thLabel);
+  game.players.forEach((p) => {
+    const th = document.createElement("th");
+    th.textContent = p.name;
+    headRow.appendChild(th);
+  });
+  thead.appendChild(headRow);
+
+  const tbody = document.createElement("tbody");
+  const totalsRow = document.createElement("tr");
+  totalsRow.className = "total-row";
+  const spacer = document.createElement("th");
+  const totalLabel = document.createElement("th");
+  totalLabel.textContent = "Total";
+  totalsRow.appendChild(spacer);
+  totalsRow.appendChild(totalLabel);
+  game.players.forEach((p) => {
+    const td = document.createElement("td");
+    td.textContent = p.total;
+    totalsRow.appendChild(td);
+  });
+  tbody.appendChild(totalsRow);
+
+  game.rounds.forEach((round) => {
+    const ordered = [...round.results].sort((a, b) => a.playerId - b.playerId);
+    const types = ["Bets", "Wins", "Pts"];
+    const dataArrays = [ordered.map((r) => r.bid), ordered.map((r) => r.won), ordered.map((r) => r.points)];
+    for (let r = 0; r < 3; r++) {
+      const tr = document.createElement("tr");
+      if (r === 0) {
+        const tdRound = document.createElement("td");
+        tdRound.className = "round-label";
+        tdRound.rowSpan = 3;
+        tdRound.textContent = round.label;
+        tr.appendChild(tdRound);
+      }
+      const tdType = document.createElement("td");
+      tdType.className = "row-type";
+      tdType.textContent = types[r];
+      tr.appendChild(tdType);
+      dataArrays[r].forEach((val) => {
+        const td = document.createElement("td");
+        td.textContent = val;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  host.appendChild(table);
+
+  document.getElementById("current-round-header").textContent = `Historial: ${game.name}`;
+}
+
+// ======= Gráfica =======
+function getPlayerColor(index) {
+  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
+  return colors[index % colors.length];
+}
+
+function showChart() {
+  let rounds, playerNames;
+  if (activeHistoryGame) {
+    rounds = activeHistoryGame.rounds;
+    playerNames = activeHistoryGame.players.map((p) => p.name);
+  } else {
+    if (roundHistory.length === 0) {
+      alert("No hay rondas jugadas aún para mostrar la gráfica.");
+      return;
+    }
+    rounds = buildRoundsWithResults();
+    playerNames = players.map((p) => p.name);
+  }
+
+  const datasets = playerNames.map((name, i) => ({
+    label: name,
+    data: [0],
+    borderColor: getPlayerColor(i),
+    backgroundColor: getPlayerColor(i),
+    tension: 0.1,
+    fill: false,
+    pointRadius: 4,
+    pointHoverRadius: 6,
+  }));
+
+  const labels = ["Inicio"];
+  const cumulatives = new Array(playerNames.length).fill(0);
+
+  rounds.forEach((round) => {
+    labels.push(round.label);
+    const ordered = [...round.results].sort((a, b) => a.playerId - b.playerId);
+    ordered.forEach((res, i) => {
+      cumulatives[i] += res.points;
+      datasets[i].data.push(cumulatives[i]);
+    });
+  });
+
+  datasets.sort((a, b) => {
+    const lastA = a.data[a.data.length - 1];
+    const lastB = b.data[b.data.length - 1];
+    return lastB - lastA;
+  });
+
+  const ctx = document.getElementById("scoreChart").getContext("2d");
+  if (chartInstance) chartInstance.destroy();
+
+  Chart.defaults.color = "#1e4022";
+
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        y: { grid: { color: "rgba(30, 64, 34, 0.1)" }, ticks: { color: "#1e4022" } },
+        x: { grid: { color: "rgba(30, 64, 34, 0.1)" }, ticks: { color: "#1e4022" } },
+      },
+      plugins: {
+        legend: { labels: { color: "#1e4022" } },
+        tooltip: { mode: "index", intersect: false, itemSort: (a, b) => b.raw - a.raw },
+      },
+    },
+  });
+
+  document.getElementById("chart-modal").style.display = "block";
+}
+
+// ======= Estadísticas =======
+function calculatePositiveStreak(rounds, playerId) {
+  let max = 0, cur = 0;
+  rounds.forEach((round) => {
+    const res = round.results.find((r) => r.playerId === playerId);
+    if (res && res.points >= 0) { cur++; max = Math.max(max, cur); } else { cur = 0; }
+  });
+  return max;
+}
+
+function calculateNegativeStreak(rounds, playerId) {
+  let max = 0, cur = 0;
+  rounds.forEach((round) => {
+    const res = round.results.find((r) => r.playerId === playerId);
+    if (res && res.points < 0) { cur++; max = Math.max(max, cur); } else { cur = 0; }
+  });
+  return max;
+}
+
+function calculateAccuracy(rounds, playerId) {
+  let exact = 0;
+  rounds.forEach((round) => {
+    const res = round.results.find((r) => r.playerId === playerId);
+    if (res && res.bid === res.won) exact++;
+  });
+  return rounds.length > 0 ? ((exact / rounds.length) * 100).toFixed(1) : 0;
+}
+
+function calculateBestRound(rounds, playerId) {
+  let best = -Infinity;
+  rounds.forEach((round) => {
+    const res = round.results.find((r) => r.playerId === playerId);
+    if (res && res.points > best) best = res.points;
+  });
+  return best > -Infinity ? best : 0;
+}
+
+function calculateWorstRound(rounds, playerId) {
+  let worst = Infinity;
+  rounds.forEach((round) => {
+    const res = round.results.find((r) => r.playerId === playerId);
+    if (res && res.points < worst) worst = res.points;
+  });
+  return worst < Infinity ? worst : 0;
+}
+
+function renderStreakTable(streaks) {
+  let html = '<table class="stats-table"><thead><tr><th>Jugador</th><th>Rondas</th></tr></thead><tbody>';
+  streaks.forEach(({ name, streak }) => { html += `<tr><td>${name}</td><td>${streak}</td></tr>`; });
+  return html + "</tbody></table>";
+}
+
+function renderTopStreaksTable(topStreaks) {
+  let html = '<table class="stats-table"><thead><tr><th>#</th><th>Jugador</th><th>Rondas</th><th>Partida</th></tr></thead><tbody>';
+  topStreaks.forEach((entry, idx) => {
+    html += `<tr><td>${idx + 1}</td><td>${entry.name}</td><td>${entry.streak}</td><td style="font-size:0.8rem;opacity:0.8;">${entry.game}</td></tr>`;
+  });
+  return html + "</tbody></table>";
+}
+
+function showGameStatsForGame(game) {
+  const modal = document.getElementById("stats-modal");
+  document.getElementById("stats-title").textContent = `Estadísticas: ${game.name || "Partida actual"}`;
+
+  const gamePlayers = game.players;
+  const gameRounds = game.rounds;
+
+  let html = '<div class="stats-section">';
+
+  html += '<h4 style="color:#eac77a;">🔥 Mejor Racha Positiva</h4>';
+  const posStreaks = gamePlayers.map((p, i) => ({ name: p.name, streak: calculatePositiveStreak(gameRounds, i) }))
+    .sort((a, b) => b.streak - a.streak);
+  html += renderStreakTable(posStreaks);
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">❄️ Mejor Racha Negativa</h4>';
+  const negStreaks = gamePlayers.map((p, i) => ({ name: p.name, streak: calculateNegativeStreak(gameRounds, i) }))
+    .sort((a, b) => b.streak - a.streak);
+  html += renderStreakTable(negStreaks);
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">🎯 % de Acierto (apuesta = ganadas)</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>% Acierto</th></tr></thead><tbody>';
+  gamePlayers.map((p, i) => ({ name: p.name, value: calculateAccuracy(gameRounds, i) }))
+    .sort((a, b) => parseFloat(b.value) - parseFloat(a.value))
+    .forEach(({ name, value }) => { html += `<tr><td>${name}</td><td>${value}%</td></tr>`; });
+  html += "</tbody></table>";
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">📊 Mejor y Peor Ronda Individual</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>Mejor</th><th>Peor</th></tr></thead><tbody>';
+  gamePlayers.forEach((p, i) => {
+    html += `<tr><td>${p.name}</td><td style="color:#4BC0C0;">+${calculateBestRound(gameRounds, i)}</td><td style="color:#e08e79;">${calculateWorstRound(gameRounds, i)}</td></tr>`;
+  });
+  html += "</tbody></table>";
+
+  html += "</div>";
+  document.getElementById("stats-content").innerHTML = html;
+  modal.style.display = "block";
+}
+
+function showGlobalStats(history) {
+  const modal = document.getElementById("stats-modal");
+  document.getElementById("stats-title").textContent = `Estadísticas Globales (${history.length} partidas)`;
+
+  // Clasificación histórica
+  const ranking = {};
+  history.forEach((game) => {
+    [...game.players].sort((a, b) => b.total - a.total).forEach((p, idx) => {
+      if (!ranking[p.name]) ranking[p.name] = 0;
+      ranking[p.name] += Math.max(1, numPlayers - idx);
+    });
+  });
+  const historicalRanking = Object.entries(ranking).map(([name, pts]) => ({ name, points: pts })).sort((a, b) => b.points - a.points);
+
+  // Partidas ganadas
+  const wins = {};
+  history.forEach((game) => {
+    const winner = [...game.players].sort((a, b) => b.total - a.total)[0];
+    if (!wins[winner.name]) wins[winner.name] = 0;
+    wins[winner.name]++;
+  });
+
+  // Puntuación media
+  const scores = {};
+  history.forEach((game) => {
+    game.players.forEach((p) => {
+      if (!scores[p.name]) scores[p.name] = { total: 0, count: 0 };
+      scores[p.name].total += p.total;
+      scores[p.name].count++;
+    });
+  });
+
+  // % acierto global
+  const accuracy = {};
+  history.forEach((game) => {
+    game.rounds.forEach((round) => {
+      round.results.forEach((res) => {
+        if (!accuracy[res.name]) accuracy[res.name] = { exact: 0, total: 0 };
+        accuracy[res.name].total++;
+        if (res.bid === res.won) accuracy[res.name].exact++;
+      });
+    });
+  });
+
+  let html = '<div class="stats-section">';
+
+  html += '<h4 style="color:#eac77a;">🏆 Clasificación Histórica</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>Puntos</th></tr></thead><tbody>';
+  historicalRanking.forEach((e, idx) => {
+    const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : "";
+    html += `<tr><td>${medal} ${e.name}</td><td>${e.points}</td></tr>`;
+  });
+  html += "</tbody></table>";
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">👑 Partidas Ganadas</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>Victorias</th></tr></thead><tbody>';
+  Object.entries(wins).sort((a, b) => b[1] - a[1]).forEach(([name, w]) => {
+    html += `<tr><td>${name}</td><td>${w}</td></tr>`;
+  });
+  html += "</tbody></table>";
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">📈 Puntuación Media por Partida</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>Media</th></tr></thead><tbody>';
+  Object.entries(scores).map(([name, d]) => ({ name, avg: d.total / d.count })).sort((a, b) => b.avg - a.avg).forEach((e) => {
+    html += `<tr><td>${e.name}</td><td>${e.avg.toFixed(1)}</td></tr>`;
+  });
+  html += "</tbody></table>";
+
+  html += '<h4 style="color:#eac77a;margin-top:1.5rem;">🎯 % de Acierto Global</h4>';
+  html += '<table class="stats-table"><thead><tr><th>Jugador</th><th>% Acierto</th></tr></thead><tbody>';
+  Object.entries(accuracy).map(([name, d]) => ({ name, acc: ((d.exact / d.total) * 100).toFixed(1) })).sort((a, b) => parseFloat(b.acc) - parseFloat(a.acc)).forEach((e) => {
+    html += `<tr><td>${e.name}</td><td>${e.acc}%</td></tr>`;
+  });
+  html += "</tbody></table>";
+
+  html += "</div>";
+  document.getElementById("stats-content").innerHTML = html;
+  modal.style.display = "block";
+}
+
+// ======= Copia de seguridad =======
+function setupBackup() {
+  const backupArea = document.getElementById("backup-area");
+  const backupText = document.getElementById("backup-text");
+  const btnSaveImport = document.getElementById("btn-save-import");
+  const btnSaveSingle = document.getElementById("btn-save-single");
+  const btnCopy = document.getElementById("btn-copy-clipboard");
+  const btnPaste = document.getElementById("btn-paste-clipboard");
+  const backupStatus = document.getElementById("backup-status");
+
+  document.getElementById("btn-export").addEventListener("click", () => {
+    const data = localStorage.getItem(HISTORY_KEY) || "[]";
+    backupArea.style.display = "block";
+    backupText.value = data;
+    btnSaveImport.style.display = "none";
+    btnSaveSingle.style.display = "none";
+    if (btnCopy) btnCopy.style.display = "block";
+    if (btnPaste) btnPaste.style.display = "none";
+    backupStatus.textContent = 'Pulsa "Copiar al Portapapeles" o selecciona el texto manualmente.';
+  });
+
+  document.getElementById("btn-import").addEventListener("click", () => {
+    backupArea.style.display = "block";
+    backupText.value = "";
+    backupText.placeholder = "Pega aquí el código copiado...";
+    btnSaveImport.style.display = "block";
+    btnSaveSingle.style.display = "none";
+    if (btnCopy) btnCopy.style.display = "none";
+    if (btnPaste) btnPaste.style.display = "block";
+    backupStatus.textContent = 'Pega el texto y pulsa "Restaurar Datos".';
+    setTimeout(() => backupText.focus(), 100);
+  });
+
+  document.getElementById("btn-import-single").addEventListener("click", () => {
+    backupArea.style.display = "block";
+    backupText.value = "";
+    backupText.placeholder = "Pega aquí el JSON de una partida individual...";
+    btnSaveImport.style.display = "none";
+    btnSaveSingle.style.display = "block";
+    if (btnCopy) btnCopy.style.display = "none";
+    if (btnPaste) btnPaste.style.display = "block";
+    backupStatus.textContent = 'Pega el JSON de una partida y pulsa "Añadir Partida".';
+    setTimeout(() => backupText.focus(), 100);
+  });
+
+  if (btnCopy) {
+    btnCopy.addEventListener("click", () => {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(backupText.value).then(() => {
+          backupStatus.textContent = "¡Copiado al portapapeles!";
+          backupStatus.style.color = "#4BC0C0";
+        }).catch(() => {
+          backupText.select();
+          document.execCommand("copy");
+          backupStatus.textContent = "Texto seleccionado. Si no se copió, hazlo manualmente.";
+          backupStatus.style.color = "#d6ad60";
+        });
+      } else {
+        backupText.select();
+        document.execCommand("copy");
+        backupStatus.textContent = "Texto seleccionado. Cópialo manualmente.";
+        backupStatus.style.color = "#d6ad60";
+      }
+    });
+  }
+
+  if (btnPaste) {
+    btnPaste.addEventListener("click", async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          backupText.value = text;
+          backupStatus.textContent = "¡Texto pegado correctamente!";
+          backupStatus.style.color = "#4BC0C0";
+          backupText.focus();
+        } else {
+          backupText.focus();
+          backupStatus.textContent = 'El campo está listo. Usa el pegado nativo de tu dispositivo.';
+          backupStatus.style.color = "#d6ad60";
+        }
+      } catch (e) {
+        backupText.focus();
+        backupStatus.textContent = "No se pudo acceder al portapapeles. Pega manualmente.";
+        backupStatus.style.color = "#d6ad60";
+      }
+    });
+  }
+
+  btnSaveImport.addEventListener("click", () => {
+    try {
+      const dataStr = backupText.value.trim();
+      if (!dataStr) { backupStatus.textContent = "Por favor, pega los datos primero."; backupStatus.style.color = "#ff6b6b"; backupText.focus(); return; }
+      const data = JSON.parse(dataStr);
+      if (Array.isArray(data)) {
+        if (confirm("Se sobrescribirán las partidas actuales con las pegadas. ¿Continuar?")) {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
+          backupStatus.textContent = "¡Datos restaurados! Recargando...";
+          backupStatus.style.color = "#4BC0C0";
+          setTimeout(() => location.reload(), 500);
+        }
+      } else {
+        backupStatus.textContent = "Error: El formato no es válido (no es una lista).";
+        backupStatus.style.color = "#ff6b6b";
+        backupText.focus();
+      }
+    } catch (e) {
+      backupStatus.textContent = "Error: El texto no es un JSON válido.";
+      backupStatus.style.color = "#ff6b6b";
+      backupText.focus();
+    }
+  });
+
+  btnSaveSingle.addEventListener("click", () => {
+    try {
+      const dataStr = backupText.value.trim();
+      if (!dataStr) { backupStatus.textContent = "Por favor, pega los datos primero."; backupStatus.style.color = "#ff6b6b"; backupText.focus(); return; }
+      const game = JSON.parse(dataStr);
+      if (game && typeof game.id === "number" && typeof game.name === "string" && Array.isArray(game.players) && Array.isArray(game.rounds)) {
+        const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        if (history.some((g) => g.id === game.id)) {
+          backupStatus.textContent = "Esta partida ya existe en el historial.";
+          backupStatus.style.color = "#d6ad60";
+          backupText.focus();
+          return;
+        }
+        history.push(game);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        backupStatus.textContent = "¡Partida añadida! Recargando...";
+        backupStatus.style.color = "#4BC0C0";
+        setTimeout(() => location.reload(), 500);
+      } else {
+        backupStatus.textContent = "Error: Formato no válido. Debe ser un objeto de partida con id, name, date, players, rounds.";
+        backupStatus.style.color = "#ff6b6b";
+        backupText.focus();
+      }
+    } catch (e) {
+      backupStatus.textContent = "Error: El texto no es un JSON válido.";
+      backupStatus.style.color = "#ff6b6b";
+      backupText.focus();
+    }
+  });
+}
+
 // ======= Nueva partida =======
 function newGame() {
   const enCurso = roundIndex > 0 && roundIndex < roundPlan.length;
@@ -323,6 +893,7 @@ function newGame() {
     );
     if (!confirmar) return;
   }
+  activeHistoryGame = null;
   clearState();
   location.reload();
 }
@@ -424,6 +995,52 @@ function setup() {
 
   const newGameBtn = document.getElementById("new-game");
   if (newGameBtn) newGameBtn.addEventListener("click", newGame);
+
+  // Botones de historial, gráfica y estadísticas
+  document.getElementById("open-history").addEventListener("click", openHistoryModal);
+  document.getElementById("close-history").addEventListener("click", () => {
+    document.getElementById("history-modal").style.display = "none";
+  });
+  document.getElementById("btn-global-stats").addEventListener("click", () => {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    if (history.length === 0) { alert("No hay partidas en el historial."); return; }
+    document.getElementById("history-modal").style.display = "none";
+    showGlobalStats(history);
+  });
+
+  document.getElementById("open-chart").addEventListener("click", showChart);
+  document.getElementById("close-chart").addEventListener("click", () => {
+    document.getElementById("chart-modal").style.display = "none";
+  });
+  document.getElementById("close-chart-btn").addEventListener("click", () => {
+    document.getElementById("chart-modal").style.display = "none";
+  });
+
+  document.getElementById("open-stats").addEventListener("click", () => {
+    if (activeHistoryGame) {
+      showGameStatsForGame(activeHistoryGame);
+    } else {
+      if (roundHistory.length === 0) { alert("No hay rondas jugadas aún para mostrar estadísticas."); return; }
+      showGameStatsForGame({
+        name: "Partida actual",
+        players: players.map((p) => ({ name: p.name, total: p.total })),
+        rounds: buildRoundsWithResults(),
+      });
+    }
+  });
+  document.getElementById("close-stats").addEventListener("click", () => {
+    document.getElementById("stats-modal").style.display = "none";
+  });
+
+  // Cerrar modales al hacer clic fuera
+  window.addEventListener("click", (e) => {
+    ["history-modal", "chart-modal", "stats-modal"].forEach((id) => {
+      const modal = document.getElementById(id);
+      if (e.target === modal) modal.style.display = "none";
+    });
+  });
+
+  setupBackup();
 
   // Cambios de nombre en vivo → actualizar cabecera y persistir
   document.querySelectorAll(".player-name").forEach((input, index) => {
