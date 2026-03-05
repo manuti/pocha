@@ -103,15 +103,21 @@ function updateCurrentRoundHeader() {
 }
 
 function updateDisplay() {
+  const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+  const winsAtMax = totalWins >= cardsPerPlayer;
+
   players.forEach((player, index) => {
     const card = document.querySelector(`.player-card[data-player='${index}']`);
     if (!card) return;
     const nameEl = card.querySelector(".player-name");
     const bidEl  = card.querySelector(".bid-value");
     const wonEl  = card.querySelector(".won-value");
+    const wonPlus = card.querySelector(".won-plus");
     if (nameEl) nameEl.value = player.name;
     if (bidEl)  bidEl.textContent = player.bid;
     if (wonEl)  wonEl.textContent = player.won;
+    // Deshabilitar (+) de Ganadas si el total global ya llegó al máximo de cartas
+    if (wonPlus) wonPlus.disabled = winsAtMax || player.won >= cardsPerPlayer;
   });
   updateBidsIndicator();
   updateSaveButtonState();
@@ -120,6 +126,13 @@ function updateDisplay() {
 function changeValue(index, field, delta) {
   const newValue = (players[index]?.[field] ?? 0) + delta;
   const maxValue = cardsPerPlayer; // límites 0..cartas
+
+  // Bloqueo global: la suma de Ganadas no puede superar el total de cartas
+  if (field === "won" && delta > 0) {
+    const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
+    if (totalWins >= cardsPerPlayer) return;
+  }
+
   players[index][field] = Math.max(0, Math.min(maxValue, newValue));
   updateDisplay();
   persistState();
