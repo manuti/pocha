@@ -21,8 +21,9 @@ h1, h2 {
 }
 
 .player-inputs {
-    display: flex;
-    flex-wrap: wrap;	
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     margin-bottom: 2rem;
 }
 
@@ -32,9 +33,12 @@ h1, h2 {
     border-radius: 8px;
     padding: 0.8rem;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    width: calc(50% - 10px);
-    margin: 5px;
     box-sizing: border-box;
+}
+
+.player-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 5px);
 }
 
 .player-card h3 {
@@ -207,43 +211,6 @@ h1, h2 {
 /* AJUSTES ESPECÍFICOS PARA MÓVILES (max-width: 600px) */
 /* ------------------------------------------------------------- */
 @media (max-width: 600px) {
-
-    .player-card {
-        padding: 0.6rem;
-    }
-
-    .player-card h3 {
-        font-size: 0.95rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .player-card input.player-name {
-        font-size: 0.95rem;
-    }
-
-    .control-group {
-        margin-bottom: 0.5rem;
-    }
-
-    .control-group label {
-        font-size: 0.85rem;
-        min-width: 4.5rem;
-    }
-
-    .control-group .controls {
-        gap: 0.3rem;
-    }
-
-    .control-group button {
-        width: 28px;
-        height: 28px;
-        font-size: 0.95rem;
-    }
-
-    .control-group .value {
-        min-width: 1.4rem;
-        font-size: 0.95rem;
-    }
 
     /* Ajustes para la tabla en móviles */
     .round-block {
