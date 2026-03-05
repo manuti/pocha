@@ -329,8 +329,8 @@ function saveRound() {
   updateSaveButtonState();
 }
 
-function endGame() {
-  saveGameToHistory();
+function endGame(skipSave = false) {
+  if (!skipSave) saveGameToHistory();
   updateCurrentRoundHeader();
   const btn = document.getElementById("next-round");
   if (btn) {
@@ -993,9 +993,9 @@ function setup() {
   updateDisplay();
   updateSaveButtonState();
 
-  // Si la partida había terminado, bloquear controles
+  // Si la partida había terminado, bloquear controles (sin volver a guardar en historial)
   if (roundIndex >= roundPlan.length) {
-    endGame();
+    endGame(true);
   }
 
   // Listeners de + / -
