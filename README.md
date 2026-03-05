@@ -302,6 +302,27 @@ function saveRound() {
 * La validación solo afecta al botón de **guardar**; los controles +/− siguen funcionando para ajustar hasta cuadrar.
 
 
+## v3.4 — No duplicar partida en historial al refrescar la pantalla
+
+* **Bug corregido**: al refrescar la página con una partida ya terminada, `setup()` llamaba a `endGame()` que internamente invocaba `saveGameToHistory()`, guardando un duplicado en el historial en cada recarga.
+* `endGame()` acepta ahora un parámetro `skipSave = false`. Desde `setup()` se llama con `skipSave = true` para solo bloquear la UI sin volver a guardar.
+
+```js
+function endGame(skipSave = false) {
+  if (!skipSave) saveGameToHistory();
+  // ... bloquea UI
+}
+
+// En setup(), al restaurar una partida ya finalizada:
+if (roundIndex >= roundPlan.length) {
+  endGame(true); // no duplicar en historial
+}
+```
+
+**Archivos**: `script.js`
+
+---
+
 ## v3.3 — Bloquear guardar ronda cuando apuestas igualan número de cartas
 
 * **Nueva validación**: el botón "Guardar ronda" se deshabilita también cuando la **suma de apuestas es igual al número de cartas** (indicador rojo).
@@ -450,6 +471,7 @@ El espacio interior resultaba demasiado ajustado y los botones `+` / `−` queda
 
 ## Historial de versiones
 
+* **v3.4**: No duplicar partida en historial al refrescar con partida terminada
 * **v3.3**: Bloquear guardar ronda cuando apuestas igualan número de cartas
 * **v3.2**: Bloquear el total de Ganadas para no superar el número de cartas
 * **v3.1**: Correcciones SW, rutas absolutas y configuración Netlify (`_headers`, `_redirects`)
