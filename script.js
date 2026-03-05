@@ -30,6 +30,58 @@ const players = Array.from({ length: numPlayers }, (_, i) => ({
   total: 0,
 }));
 
+// Historial de rondas ya guardadas (para reconstruir la tabla tras recargar)
+let roundHistory = []; // [{label, cards, betsArr, winsArr, ptsArr}]
+
+// ======= Persistencia en localStorage =======
+const STORAGE_KEY = "pocha_game_state";
+
+function persistState() {
+  try {
+    const state = {
+      roundIndex,
+      players: players.map((p) => ({ ...p })),
+      roundHistory,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // Ignorar errores de almacenamiento (modo privado, cuota, etc.)
+  }
+}
+
+function restoreState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    if (typeof state.roundIndex !== "number") return false;
+
+    roundIndex = state.roundIndex;
+    cardsPerPlayer =
+      roundIndex < roundPlan.length
+        ? roundPlan[roundIndex].cards
+        : roundPlan[roundPlan.length - 1].cards;
+
+    state.players.forEach((sp, i) => {
+      players[i].name = sp.name;
+      players[i].bid = sp.bid;
+      players[i].won = sp.won;
+      players[i].total = sp.total;
+    });
+
+    roundHistory = state.roundHistory || [];
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function clearState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {}
+}
+
 // ======= UI helpers generales =======
 function updateCurrentRoundHeader() {
   const header = document.getElementById("current-round-header");
@@ -64,6 +116,7 @@ function changeValue(index, field, delta) {
   const maxValue = cardsPerPlayer; // límites 0..cartas
   players[index][field] = Math.max(0, Math.min(maxValue, newValue));
   updateDisplay();
+  persistState();
 }
 
 function getIndex(element) {
@@ -226,6 +279,9 @@ function saveRound() {
     p.won = 0;
   });
 
+  // Guardar ronda en el historial (para poder reconstruir tras recargar)
+  roundHistory.push({ label: roundLabel, cards, betsArr, winsArr, ptsArr });
+
   // Añadir 3 filas de la ronda a la tabla
   appendRoundRows(roundLabel, cards, betsArr, winsArr, ptsArr);
   updateTotalsRow();
@@ -233,11 +289,13 @@ function saveRound() {
   // Avanzar en el plan de rondas
   roundIndex++;
   if (roundIndex >= roundPlan.length) {
+    persistState();
     endGame();
     return;
   }
 
   cardsPerPlayer = roundPlan[roundIndex].cards;
+  persistState();
   updateDisplay();
   updateCurrentRoundHeader();
   updateSaveButtonState();
@@ -254,6 +312,19 @@ function endGame() {
     .querySelectorAll(".player-name, .bid-plus, .bid-minus, .won-plus, .won-minus")
     .forEach((el) => (el.disabled = true));
   updateBidsIndicator();
+}
+
+// ======= Nueva partida =======
+function newGame() {
+  const enCurso = roundIndex > 0 && roundIndex < roundPlan.length;
+  if (enCurso) {
+    const confirmar = confirm(
+      "¿Seguro que quieres empezar una nueva partida?\nSe perderá el avance actual."
+    );
+    if (!confirmar) return;
+  }
+  clearState();
+  location.reload();
 }
 
 // ======= Inicialización de tarjetas de jugador =======
@@ -302,13 +373,37 @@ function askPlayerNames() {
 // ======= Setup =======
 function setup() {
   ensurePlayerCards();
-  askPlayerNames();
+
+  // Intentar restaurar partida guardada
+  const restored = restoreState();
+
+  if (restored) {
+    // Sincronizar los inputs de nombre con el estado restaurado
+    players.forEach((p, i) => {
+      const input = document.querySelector(`.player-card[data-player='${i}'] .player-name`);
+      if (input) input.value = p.name;
+    });
+  } else {
+    askPlayerNames();
+  }
+
   ensureScoreTable();
+
+  // Reconstruir la tabla de puntuación con el historial guardado
+  roundHistory.forEach((h) => {
+    appendRoundRows(h.label, h.cards, h.betsArr, h.winsArr, h.ptsArr);
+  });
+
   renderHeader();
   updateTotalsRow();
   updateCurrentRoundHeader();
   updateDisplay();
   updateSaveButtonState();
+
+  // Si la partida había terminado, bloquear controles
+  if (roundIndex >= roundPlan.length) {
+    endGame();
+  }
 
   // Listeners de + / -
   document.querySelectorAll(".bid-plus").forEach((btn) =>
@@ -327,11 +422,15 @@ function setup() {
   const nextBtn = document.getElementById("next-round");
   if (nextBtn) nextBtn.addEventListener("click", saveRound);
 
-  // Cambios de nombre en vivo → actualizar cabecera
+  const newGameBtn = document.getElementById("new-game");
+  if (newGameBtn) newGameBtn.addEventListener("click", newGame);
+
+  // Cambios de nombre en vivo → actualizar cabecera y persistir
   document.querySelectorAll(".player-name").forEach((input, index) => {
     input.addEventListener("input", () => {
       players[index].name = input.value || `Jugador ${index + 1}`;
       renderHeader();
+      persistState();
     });
   });
 }
