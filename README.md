@@ -302,6 +302,120 @@ function saveRound() {
 * La validación solo afecta al botón de **guardar**; los controles +/− siguen funcionando para ajustar hasta cuadrar.
 
 
+## v3.3 — Bloquear guardar ronda cuando apuestas igualan número de cartas
+
+* **Nueva validación**: el botón "Guardar ronda" se deshabilita también cuando la **suma de apuestas es igual al número de cartas** (indicador rojo).
+* El botón muestra `Apuestas igualan cartas (X/Y)` en ese estado, impidiendo guardar hasta ajustar las apuestas.
+* Implementación en `updateSaveButtonState()`:
+
+```js
+const totalBids = players.reduce((s, p) => s + (p.bid || 0), 0);
+if (totalBids === cardsPerPlayer) {
+  btn.disabled = true;
+  btn.textContent = `Apuestas igualan cartas (${totalBids}/${cardsPerPlayer})`;
+  return;
+}
+```
+
+**Archivos**: `script.js`
+
+---
+
+## v3.2 — Bloquear el total de Ganadas para no superar el número de cartas
+
+* **Nueva validación en tiempo real**: la suma global de `Ganadas` no puede superar el número de cartas de la ronda.
+* En `changeValue()`: si `field === 'won'` y `delta > 0`, la operación se aborta cuando el total ya alcanza `cardsPerPlayer`.
+* En `updateDisplay()`: el botón `(+)` de `Ganadas` de cada jugador se deshabilita automáticamente cuando el máximo global ya está cubierto.
+
+**Archivos**: `script.js`
+
+---
+
+## v3.1 — Correcciones SW, rutas y configuración Netlify
+
+* **`sw.js`**: corregidos nombres de iconos (`icon-192.png` → `icon-192x192.png`, `icon-512.png` → `icon-512x512.png`).
+* **`sw.js`**: rutas absolutas en `ASSETS` en lugar de relativas; añadido `catch` en el fetch con fallback a `/index.html` para navegación offline; versión de caché subida a `v5`.
+* **`index.html`**: `href="/manifest.json"` y `register('/sw.js')` con rutas absolutas.
+* **`manifest.json`**: `start_url: "/"` para coherencia de scope PWA.
+* **`_headers`** (nuevo): `Cache-Control: no-cache` para `/sw.js` para evitar cacheo agresivo del SW.
+* **`_redirects`** (nuevo): regla `/* /index.html 200` para soporte SPA y navegación directa en Netlify.
+
+**Archivos**: `sw.js`, `index.html`, `manifest.json`, `_headers`, `_redirects`
+
+---
+
+## v3.0 — Historial de partidas con gráfica y estadísticas
+
+* **Historial persistente**: cada partida completada se guarda automáticamente en `localStorage` (`pocha_history`).
+* **Modal de historial**: lista de partidas anteriores con el ganador destacado; permite borrado individual.
+* **Vista de partida histórica**: reconstruye la tabla de puntuación horizontal al seleccionar una partida.
+* **Gráfica de evolución**: renderizada con Chart.js v4.5.1 (incluido offline como `chart.js`); 5 colores para los 5 jugadores.
+* **Estadísticas por partida**: rachas positivas/negativas, % de acierto, mejor/peor ronda.
+* **Estadísticas globales**: clasificación histórica, partidas ganadas, puntuación media, % de acierto global.
+* **Copia de seguridad**: exportar/importar el historial completo o una partida individual vía portapapeles.
+* `sw.js` actualizado para cachear `chart.js`.
+
+**Archivos**: `chart.js` (nuevo), `index.html`, `script.js`, `style.css`, `sw.js`
+
+---
+
+## v2.9 — Funcionamiento 100% offline: eliminar dependencia de Google Fonts
+
+* Se elimina el `<link>` a `fonts.googleapis.com` de `index.html`.
+* `style.css`: `Quicksand` sustituida por un stack de fuentes del sistema (`system-ui`, `-apple-system`, `Segoe UI`, `Roboto`, `sans-serif`).
+* `sw.js`: eliminada la URL de Google Fonts del precaché y el código de caché dinámico de fuentes externas; versión de caché subida a `v3`.
+* La app no depende de ningún recurso externo y funciona por completo desde la instalación sin conexión.
+
+**Archivos**: `index.html`, `style.css`, `sw.js`
+
+---
+
+## v2.8 — Persistencia del progreso de partida en localStorage
+
+* El **estado completo** (jugadores, `roundIndex`, historial de rondas) se guarda en `localStorage` en cada acción relevante: cambio de nombre, cambio de apuesta/ganadas y guardado de ronda.
+* Al cargar la página se **restaura el estado** automáticamente, reconstruyendo la tabla de puntuación a partir del historial guardado.
+* Nuevo botón **"Nueva partida"**: pide confirmación antes de limpiar el estado guardado y recargar, evitando pérdidas accidentales.
+
+**Archivos**: `index.html`, `script.js`, `style.css`
+
+---
+
+## v2.7 — Soporte offline para Android PWA/APK
+
+* **`index.html`**: añadido el registro del Service Worker (estaba ausente, lo que rompía todo el soporte offline).
+* **`sw.js`**: rutas relativas en la lista de caché (compatibilidad con despliegues en subcarpetas); evento `activate` para limpiar cachés antiguas; `skipWaiting` + `clients.claim` para activación inmediata; versión de caché subida a `v2`.
+* Caché dinámica de CSS y fuentes de Google Fonts para uso offline completo.
+
+**Archivos**: `index.html`, `sw.js`
+
+---
+
+## v2.6 — Ajuste de layout móvil: todas las tarjetas caben en pantalla
+
+En pantallas ≤ 600 px la cuadrícula de 2 columnas desbordaba porque el `control-group` (etiqueta + botones) era demasiado ancho.
+
+### Cambios en `style.css` (media query `max-width: 600px`)
+
+* `body` / `.container`: padding reducido para recuperar espacio horizontal.
+* `.control-group`: `flex-direction: column` para apilar la etiqueta encima de los controles.
+* Fila de botones centrada dentro de cada tarjeta.
+* Tamaño de botones, fuentes y paddings ligeramente reducidos.
+* Márgenes del encabezado y `.bids-box` compactos para reducir el scroll vertical.
+
+**Archivos**: `style.css`
+
+---
+
+## v2.5 — Layout móvil con CSS Grid
+
+* Se reemplaza **flexbox** por **CSS Grid** (`grid-template-columns: 1fr 1fr`) en `.player-inputs` para garantizar un layout de 2 columnas consistente entre móvil y vista web.
+* Se eliminan las reducciones de tamaño específicas de móvil que causaban inconsistencia visual.
+* La última tarjeta (posición impar) se mantiene al 50 % de ancho, alineada a la izquierda, igual que en la vista web.
+
+**Archivos**: `style.css`
+
+---
+
 ## v2.4 — Corrección de alineación de botones en móvil (PWA)
 
 En dispositivos móviles (~390 px de ancho) las tarjetas de jugador ocupan el 50 % del ancho de pantalla.
@@ -336,6 +450,15 @@ El espacio interior resultaba demasiado ajustado y los botones `+` / `−` queda
 
 ## Historial de versiones
 
+* **v3.3**: Bloquear guardar ronda cuando apuestas igualan número de cartas
+* **v3.2**: Bloquear el total de Ganadas para no superar el número de cartas
+* **v3.1**: Correcciones SW, rutas absolutas y configuración Netlify (`_headers`, `_redirects`)
+* **v3.0**: Historial de partidas con gráfica (Chart.js) y estadísticas
+* **v2.9**: Funcionamiento 100% offline — eliminar dependencia de Google Fonts
+* **v2.8**: Persistencia del progreso de partida en localStorage + botón “Nueva partida”
+* **v2.7**: Soporte offline para Android PWA/APK (registro del SW, rutas relativas, activate)
+* **v2.6**: Ajuste de layout móvil para que todas las tarjetas quepan en pantalla
+* **v2.5**: Layout móvil con CSS Grid (2 columnas consistentes)
 * **v2.4**: Corrección de alineación de botones +/− en móvil / PWA
 * **v2.3**: Validación de “Ganadas = Cartas de la ronda”
 * **v2.2**: Etiquetas cortas en la tabla (1, 2, 3… y S1, S2…)
