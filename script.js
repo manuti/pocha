@@ -163,11 +163,20 @@ function updateSaveButtonState() {
     return;
   }
 
+  const totalBids = players.reduce((sum, p) => sum + (p.bid || 0), 0);
+  const bidsOk = totalBids !== cardsPerPlayer;
+
   const totalWins = players.reduce((sum, p) => sum + (p.won || 0), 0);
-  const ok = totalWins === cardsPerPlayer;
+  const winsOk = totalWins === cardsPerPlayer;
+
+  const ok = bidsOk && winsOk;
 
   btn.disabled = !ok;
-  btn.textContent = ok ? "Guardar ronda" : `Ajusta Ganadas (${totalWins}/${cardsPerPlayer})`;
+  if (!bidsOk) {
+    btn.textContent = `Apuestas igualan cartas (${totalBids}/${cardsPerPlayer})`;
+  } else {
+    btn.textContent = winsOk ? "Guardar ronda" : `Ajusta Ganadas (${totalWins}/${cardsPerPlayer})`;
+  }
 }
 
 // ======= Scoreboard: Tabla única horizontal =======
